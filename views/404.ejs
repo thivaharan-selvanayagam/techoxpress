@@ -1,0 +1,22 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<section class="page-404">
+  <div style="position:relative; z-index:2;">
+    <div class="page-404__num" aria-hidden="true">404</div>
+    <h1 class="page-404__title">THIS PAGE<br><em style="color:var(--orange);">GOT LOST.</em></h1>
+    <p class="page-404__sub">Looks like this delivery took a wrong turn. The page you're looking for doesn't exist or has been moved.</p>
+    <div class="page-404__actions">
+      <a href="/" class="btn btn-primary">
+        Back to Home
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+      <a href="/tracking" class="btn btn-outline">Track a Package</a>
+    </div>
+    <div class="page-404__code">
+      Error Code: <span>TXT-0000-404</span> &nbsp;·&nbsp; Status: <span>NOT DELIVERED</span>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

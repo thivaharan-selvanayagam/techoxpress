@@ -1,0 +1,305 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__grid"></div>
+
+  <div class="hero__panel">
+    <div class="hero__panel-stripe"></div>
+    <div class="hero__panel-border"></div>
+  </div>
+
+  <div class="hero__lines" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="hero__body">
+    <div class="container">
+      <div class="hero__content">
+
+        <div class="hero__eyebrow">
+          <div class="hero__eyebrow-dot"></div>
+          Sri Lanka's Premium Courier Network
+        </div>
+
+        <h1 class="hero__title">
+          SPEED.<br>
+          <em>PRECISION.</em><br>
+          DELIVERED.
+        </h1>
+
+        <p class="hero__desc">
+          From same-day express to bulk corporate logistics — Techo Xpress moves your world with technology-powered reliability, trackable in real time.
+        </p>
+
+        <div class="hero__actions">
+          <a href="/contact" class="btn btn-primary">
+            Get a Quote
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+          <a href="/tracking" class="btn btn-outline">
+            Track a Package
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+
+        <div class="hero__stats">
+          <div>
+            <div class="hero__stat-val"><span data-count="98" data-suffix="%">0%</span></div>
+            <div class="hero__stat-lbl">On-Time Rate</div>
+          </div>
+          <div>
+            <div class="hero__stat-val"><span data-count="25" data-suffix="+">0+</span></div>
+            <div class="hero__stat-lbl">Districts Covered</div>
+          </div>
+          <div>
+            <div class="hero__stat-val"><span data-count="500" data-suffix="+">0+</span></div>
+            <div class="hero__stat-lbl">Deliveries / Month</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="hero__ticker" aria-hidden="true">
+    <div class="hero__ticker-track">
+      <span>Same-Day Express Delivery</span>
+      <span>Real-Time Package Tracking</span>
+      <span>Corporate Logistics Solutions</span>
+      <span>E-Commerce Fulfillment</span>
+      <span>Island-Wide Coverage</span>
+      <span>Bulk Shipping</span>
+      <span>Tech-Powered Logistics</span>
+      <!-- duplicate for seamless loop -->
+      <span>Same-Day Express Delivery</span>
+      <span>Real-Time Package Tracking</span>
+      <span>Corporate Logistics Solutions</span>
+      <span>E-Commerce Fulfillment</span>
+      <span>Island-Wide Coverage</span>
+      <span>Bulk Shipping</span>
+      <span>Tech-Powered Logistics</span>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK TRACK -->
+<div class="trackbar">
+  <div class="container">
+    <p class="trackbar__label">Have a tracking number? Check your shipment instantly.</p>
+    <form class="trackbar__form" action="/tracking" method="POST">
+      <div class="trackbar__icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <input class="trackbar__input" type="text" name="trackingId" placeholder="Enter tracking ID — e.g. TXT-2025-001" autocomplete="off" />
+      <button type="submit" class="trackbar__btn">
+        Track
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="mono-label">What We Do</div>
+        <h2 class="section-title">Our <em>Services</em></h2>
+      </div>
+      <a href="/services" class="btn btn-ghost">
+        View All
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-card__num">01</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="service-card__title">Same-Day Express</div>
+        <div class="service-card__desc">Pickup and delivery within the same business day across Greater Colombo and selected districts.</div>
+      </div>
+
+      <div class="service-card reveal" data-d="1">
+        <div class="service-card__num">02</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="service-card__title">Standard Delivery</div>
+        <div class="service-card__desc">Reliable 1–3 day island-wide delivery. Fully trackable with automated status notifications.</div>
+      </div>
+
+      <div class="service-card reveal" data-d="2">
+        <div class="service-card__num">03</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="service-card__title">Bulk & Corporate</div>
+        <div class="service-card__desc">Dedicated account management and custom SLAs for high-volume enterprise shippers.</div>
+      </div>
+
+      <div class="service-card reveal" data-d="1">
+        <div class="service-card__num">04</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="service-card__title">International Shipping</div>
+        <div class="service-card__desc">Cross-border delivery to and from Sri Lanka via our partner network with documentation support.</div>
+      </div>
+
+      <div class="service-card reveal" data-d="2">
+        <div class="service-card__num">05</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </div>
+        <div class="service-card__title">E-Commerce Fulfillment</div>
+        <div class="service-card__desc">Seamless store integration with COD collection, returns handling, and remittance.</div>
+      </div>
+
+      <div class="service-card reveal" data-d="3">
+        <div class="service-card__num">06</div>
+        <div class="service-card__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="service-card__title">Live Tracking</div>
+        <div class="service-card__desc">Built by Techo Labs — real-time shipment visibility for senders and recipients, 24/7.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="why-section">
+  <div class="container">
+    <div class="why-section__inner">
+      <div>
+        <div class="mono-label">Why Techo Xpress</div>
+        <h2 class="section-title reveal">The Xpress<br><em>Advantage</em></h2>
+        <div class="why-items">
+          <div class="why-item reveal">
+            <div class="why-item__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <div class="why-item__title">Technology-Powered</div>
+              <div class="why-item__desc">Our tracking and fleet software is built in-house by Techo Labs — faster updates, more accuracy.</div>
+            </div>
+          </div>
+          <div class="why-item reveal" data-d="1">
+            <div class="why-item__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="why-item__title">Proof of Delivery</div>
+              <div class="why-item__desc">Every delivery confirmed with digital signature or photo — total peace of mind for sender and recipient.</div>
+            </div>
+          </div>
+          <div class="why-item reveal" data-d="2">
+            <div class="why-item__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="why-item__title">Committed Timelines</div>
+              <div class="why-item__desc">We don't give estimates — we commit to them. 98% on-time rate, tracked and published.</div>
+            </div>
+          </div>
+          <div class="why-item reveal" data-d="3">
+            <div class="why-item__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="why-item__title">Real Human Support</div>
+              <div class="why-item__desc">A real person answers when you call. Corporate clients get a named account manager.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="map-box reveal" data-d="2">
+        <div class="map-box__title">Island-Wide Coverage</div>
+        <div class="map-box__svg-wrap" style="height: 320px;">
+          <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+            <!-- Dot grid -->
+            <defs>
+              <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.08)"/>
+              </pattern>
+            </defs>
+            <rect width="300" height="400" fill="var(--bg-card)"/>
+            <rect width="300" height="400" fill="url(#dots)"/>
+            <!-- island outline (simplified Sri Lanka) -->
+            <path d="M110 28 Q150 18 190 38 Q228 64 236 112 Q250 168 244 228 Q238 288 210 344 Q188 382 150 396 Q112 382 90 344 Q62 288 56 228 Q50 168 64 112 Q72 64 110 28Z"
+              stroke="rgba(212,79,10,0.2)" stroke-width="1.5" fill="rgba(212,79,10,0.04)"/>
+            <!-- route lines -->
+            <line x1="88" y1="218" x2="142" y2="142" stroke="rgba(212,79,10,0.3)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="142" y1="142" x2="178" y2="44" stroke="rgba(212,79,10,0.25)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="88"  y1="218" x2="74"  y2="184" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="88"  y1="218" x2="110" y2="330" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="142" y1="142" x2="208" y2="192" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
+          </svg>
+          <!-- City dots positioned via CSS absolute inside relative wrapper -->
+          <div class="map-city" style="top:56%; left:30%;">
+            <div class="map-city-dot lg"></div>
+            <div class="map-city-label">Colombo</div>
+          </div>
+          <div class="map-city" style="top:37%; left:48%;">
+            <div class="map-city-dot lg"></div>
+            <div class="map-city-label">Kandy</div>
+          </div>
+          <div class="map-city" style="top:84%; left:38%;">
+            <div class="map-city-dot"></div>
+            <div class="map-city-label">Galle</div>
+          </div>
+          <div class="map-city" style="top:11%; left:60%;">
+            <div class="map-city-dot"></div>
+            <div class="map-city-label">Jaffna</div>
+          </div>
+          <div class="map-city" style="top:47%; left:24%;">
+            <div class="map-city-dot"></div>
+            <div class="map-city-label">Negombo</div>
+          </div>
+          <div class="map-city" style="top:51%; left:70%;">
+            <div class="map-city-dot"></div>
+            <div class="map-city-label">Batticaloa</div>
+          </div>
+        </div>
+        <div class="map-tags">
+          <span class="map-tag">25 Districts</span>
+          <span class="map-tag">3 Main Hubs</span>
+          <span class="map-tag">Island-Wide</span>
+          <span class="map-tag">Same-Day Zones</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="container">
+    <div class="cta-band__inner">
+      <div>
+        <div class="cta-band__title">Ready to Ship Smarter?</div>
+        <div class="cta-band__sub">Join hundreds of Sri Lankan businesses that trust Techo Xpress.</div>
+      </div>
+      <div class="cta-band__actions">
+        <a href="/contact" class="btn btn-white">
+          Get a Quote
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+        <a href="/tracking" class="btn" style="background:rgba(0,0,0,0.2); color:#fff; border:2px solid rgba(255,255,255,0.35);">
+          Track Package
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

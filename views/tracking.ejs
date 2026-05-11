@@ -1,0 +1,133 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero__bg"></div>
+  <div class="page-hero__accent"></div>
+  <div class="container">
+    <div class="page-hero__label">Techo Xpress / Package Tracking</div>
+    <h1 class="page-hero__title">TRACK YOUR<br><em>SHIPMENT.</em></h1>
+  </div>
+</section>
+
+<!-- TRACKING SECTION -->
+<section class="tracking-page">
+  <div class="container">
+    <div class="tracking-wrap">
+
+      <!-- Search Form -->
+      <div class="track-box">
+        <div class="track-box__title">Enter Tracking ID</div>
+        <div class="track-box__sub">Your tracking ID was sent via SMS and email when your package was collected. Format: TXT-YYYY-XXX</div>
+        <form action="/tracking" method="POST">
+          <div class="track-form-row">
+            <input
+              class="track-input"
+              type="text"
+              name="trackingId"
+              placeholder="e.g.  TXT-2025-001"
+              value="<%= query %>"
+              autocomplete="off"
+              autocapitalize="characters"
+            />
+            <button type="submit" class="track-btn">
+              Track
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Error -->
+      <% if (error) { %>
+      <div class="track-alert track-alert--error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <%= error %>
+      </div>
+      <% } %>
+
+      <!-- Result -->
+      <% if (order) { %>
+      <div class="result-card">
+
+        <div class="result-card__head">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">Tracking ID</div>
+            <div class="result-card__id"><%= order.id %></div>
+          </div>
+          <div class="status-pill status-pill--<%= order.status %>">
+            <div class="status-pill__dot"></div>
+            <%= order.statusLabel %>
+          </div>
+        </div>
+
+        <div class="result-card__meta">
+          <div>
+            <div class="meta-item__lbl">From</div>
+            <div class="meta-item__val"><%= order.sender %></div>
+          </div>
+          <div>
+            <div class="meta-item__lbl">To</div>
+            <div class="meta-item__val"><%= order.recipient %></div>
+          </div>
+          <div>
+            <div class="meta-item__lbl">Weight</div>
+            <div class="meta-item__val"><%= order.weight %></div>
+          </div>
+          <div>
+            <div class="meta-item__lbl">Service</div>
+            <div class="meta-item__val"><%= order.service %></div>
+          </div>
+        </div>
+
+        <% if (order.status !== 'delivered') { %>
+        <div class="result-card__eta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Estimated Delivery: <%= order.eta.toUpperCase() %>
+        </div>
+        <% } %>
+
+        <div class="timeline">
+          <% order.events.forEach((ev) => { %>
+          <div class="timeline-row <%= ev.done ? '' : 'pending' %>">
+            <div class="timeline-dot <%= ev.done ? 'done' : 'pending' %>">
+              <% if (ev.done) { %>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <% } else { %>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>
+              <% } %>
+            </div>
+            <div class="timeline-text">
+              <div class="timeline-event"><%= ev.label %></div>
+              <div class="timeline-desc"><%= ev.desc %></div>
+              <% if (ev.done) { %>
+              <div class="timeline-time"><%= ev.date %> — <%= ev.time %></div>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+      </div>
+      <% } %>
+
+      <!-- Tips (when no result) -->
+      <% if (!order) { %>
+      <div class="track-tips">
+        <h4>Where to Find Your Tracking ID</h4>
+        <ul>
+          <li>Check the SMS sent to the sender's phone at time of pickup</li>
+          <li>Check the confirmation email from hello@techoxpress.lk</li>
+          <li>It's printed on the shipping label beneath the barcode</li>
+          <li>Contact the sender if you're the recipient and don't have the ID</li>
+          <li>Try demo IDs: <span class="demo-id">TXT-2025-001</span> or <span class="demo-id">TXT-2025-002</span></li>
+        </ul>
+      </div>
+      <% } %>
+
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
