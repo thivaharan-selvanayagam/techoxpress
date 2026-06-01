@@ -90,4 +90,63 @@ router.post('/commit', async (req, res) => {
   }
 });
 
+// POST: Process Delivery Handover Confirmation & Complete Shipment Cycle
+router.post('/deliver', async (req, res) => {
+  const { trackingId } = req.body;
+  const cleanId = (trackingId || '').trim().toUpperCase();
+
+  try {
+    const targetParcel = await Parcel.findOne({ trackingId: cleanId });
+    if (!targetParcel) throw new Error('Tracking ID sequence vector not found in active registries.');
+
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentDate = 'Today';
+
+    // 1. Shift parcel architecture metrics
+    targetParcel.status = 'delivered';
+    targetParcel.statusLabel = 'Delivered';
+    targetParcel.eta = 'Completed';
+
+    // 2. Inject final milestone log at the top of the chronological timeline array
+    targetParcel.events.unshift({
+      time: currentTime,
+      date: currentDate,
+      label: 'Package Delivered',
+      desc: `Parcel successfully dropped off. Safe-drop lifecycle completed by courier.`,
+      done: true
+    });
+
+    await targetParcel.save();
+
+    // 3. Re-optimize the courier status back to "Available" if one was attached
+    if (targetParcel.assignedRider) {
+      const activeCourier = await Rider.findById(targetParcel.assignedRider);
+      if (activeCourier) {
+        activeCourier.status = 'Available';
+        await activeCourier.save();
+      }
+    }
+
+    const activeRiders = await Rider.find({ status: 'Available' });
+    res.render('dispatch', { 
+      title: 'Xpress Dispatch Terminal', 
+      page: 'dispatch', 
+      riders: activeRiders, 
+      success: `Shipment ${cleanId} successfully flagged as DELIVERED. Courier returned to base fleet pool.`, 
+      error: null 
+    });
+
+  } catch (err) {
+    console.error('Delivery confirmation error:', err);
+    const fallbackRiders = await Rider.find({ status: 'Available' }).catch(() => []);
+    res.render('dispatch', { 
+      title: 'Xpress Dispatch Terminal', 
+      page: 'dispatch', 
+      riders: fallbackRiders, 
+      success: false, 
+      error: `Delivery Logging Error: ${err.message}` 
+    });
+  }
+});
+
 module.exports = router;
