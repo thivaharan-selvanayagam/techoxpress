@@ -1,0 +1,169 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero">
+  <div class="page-hero__bg"></div>
+  <div class="page-hero__accent"></div>
+  <div class="container">
+    <div class="page-hero__label">Hub Overwatch Console</div>
+    <h1 class="page-hero__title">Cargo <em>Fulfillment</em></h1>
+  </div>
+</section>
+
+<section class="contact-page">
+  <div class="container">
+    <div class="contact-grid" style="grid-template-columns: 1fr;">
+      
+      <div class="contact-form-box">
+        <div class="form-sub">Fleet Assignment Engine</div>
+        <h2 class="form-heading">Barcode Manifest Terminal</h2>
+
+        <% if (success) { %>
+        <div class="form-alert form-alert--success" style="margin-bottom: 2rem; background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; padding: 1rem; border-radius: var(--radius); color: #2ecc71; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <%= success %>
+        </div>
+        <% } %>
+        
+        <% if (error) { %>
+        <div class="form-alert form-alert--error" style="margin-bottom: 2rem; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error %>
+        </div>
+        <% } %>
+
+        <form id="dispatchForm" method="POST" action="/dispatch/commit">
+          
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="riderSelect" style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Select Target Freelance Courier Unit *</label>
+            <select id="riderSelect" name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); letter-spacing: 0.05em;">
+              <option value="">-- SELECT AVAILABLE COURIER PROFILE --</option>
+              <% riders.forEach(rider => { %>
+                <option value="<%= rider._id %>">
+                  <%= rider.name %> ➔ 📞 <%= rider.phone %> [<%= rider.vehicle %>]
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top: 2.5rem; margin-bottom: 1.5rem;">
+            <label for="barcodeScannerInput" style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Hardware Barcode Scanner Interface</label>
+            <input 
+              type="text" 
+              id="barcodeScannerInput" 
+              placeholder="Focus cursor here and scan parcel tracking barcodes..." 
+              style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid rgba(212, 79, 10, 0.3); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); font-size: 1.1rem; text-transform: uppercase;"
+              autocomplete="off"
+            >
+            <small style="color: var(--muted); display: block; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem;">
+              SYSTEM ENGINE NOTE: Laser guns automatically fire a trailing [ENTER] string loop command execution.
+            </small>
+          </div>
+
+          <div style="margin: 2.5rem 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+            <div class="form-sub" style="margin-bottom: 1rem; color: var(--white); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+              Manifest Blueprint Staging Matrix (<span id="scanCount" style="color: var(--orange); font-weight: bold;">0</span> packages loaded)
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border); color: var(--muted);">
+                  <th style="padding: 0.75rem 0.5rem;">Index</th>
+                  <th style="padding: 0.75rem 0.5rem;">Tracking Sequence Vector</th>
+                  <th style="padding: 0.75rem 0.5rem; text-align: right;">Action Boundary</th>
+                </tr>
+              </thead>
+              <tbody id="manifestQueueBody">
+                <tr id="emptyRowState">
+                  <td colspan="3" style="padding: 2.5rem; text-align: center; color: var(--muted); font-style: italic;">
+                    Staging pipeline empty. Intercept cargo stickers to compile data rows.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1.1rem; font-size: 1.05rem; background: var(--orange); color: var(--white); border: none; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+            Commit Manifest & Dispatch Freelancer
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const scannerInput = document.getElementById('barcodeScannerInput');
+  const queueBody = document.getElementById('manifestQueueBody');
+  const emptyRowState = document.getElementById('emptyRowState');
+  const scanCountDisplay = document.getElementById('scanCount');
+  const formElement = document.getElementById('dispatchForm');
+  
+  let scannedSet = new Set();
+
+  scannerInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent scanner from prematurely submitting form
+      
+      const trackingId = scannerInput.value.trim().toUpperCase();
+      scannerInput.value = ''; // Flash-clear field for next scan
+      
+      if (!trackingId) return;
+
+      if (scannedSet.has(trackingId)) {
+        alert(`Read Matrix Error: ${trackingId} is already in the staging loop.`);
+        return;
+      }
+
+      if (scannedSet.size === 0 && emptyRowState) {
+        emptyRowState.remove();
+      }
+
+      scannedSet.add(trackingId);
+      scanCountDisplay.textContent = scannedSet.size;
+
+      const row = document.createElement('tr');
+      row.id = `row_${trackingId}`;
+      row.style.borderBottom = '1px solid var(--border)';
+      row.style.color = 'var(--white)';
+      
+      row.innerHTML = `
+        <td style="padding: 0.85rem 0.5rem; color: var(--orange); font-weight: bold;">#${scannedSet.size}</td>
+        <td style="padding: 0.85rem 0.5rem; letter-spacing: 0.05em;">
+          ${trackingId}
+          <input type="hidden" name="trackingIds" value="${trackingId}">
+        </td>
+        <td style="padding: 0.85rem 0.5rem; text-align: right;">
+          <button type="button" class="remove-btn" data-id="${trackingId}" style="color: var(--muted); background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem;">✕ Remove</button>
+        </td>
+      `;
+      
+      const removeBtn = row.querySelector('.remove-btn');
+      removeBtn.addEventListener('click', function() {
+        const idToRemove = this.getAttribute('data-id');
+        document.getElementById(`row_${idToRemove}`).remove();
+        scannedSet.delete(idToRemove);
+        scanCountDisplay.textContent = scannedSet.size;
+        
+        if (scannedSet.size === 0) {
+          queueBody.appendChild(emptyRowState);
+        }
+      });
+
+      queueBody.appendChild(row);
+    }
+  });
+
+  formElement.addEventListener('submit', (e) => {
+    if (scannedSet.size === 0) {
+      e.preventDefault();
+      alert('Validation Boundary Failure: Scan at least 1 cargo unit to compile a manifest.');
+    }
+  });
+});
+</script>
+
+<%- include('partials/footer') %>
