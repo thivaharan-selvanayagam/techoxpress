@@ -237,10 +237,26 @@
           </div>
 
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+            
             <div class="form-group">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Cargo Mass Dimension *</label>
-              <input type="text" name="weight" placeholder="e.g. 2.5 kg" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Cargo Mass Dimension *</label>
+              <select name="weight" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none; height: 100%; font-family: var(--font-mono);">
+                <option value="1kg">1kg</option>
+                <option value="2kg">2kg</option>
+                <option value="3kg">3kg</option>
+                <option value="4kg">4kg</option>
+                <option value="5kg">5kg</option>
+                <option value="6kg">6kg</option>
+                <option value="7kg">7kg</option>
+                <option value="8kg">8kg</option>
+                <option value="9kg">9kg</option>
+                <option value="10kg">10kg</option>
+                <option value="10+kg">10+kg</option>
+                <option value="15+kg">15+kg</option>
+                <option value="20+kg">20+kg</option>
+              </select>
             </div>
+
             <div class="form-group">
               <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Service Urgency Protocol *</label>
               <select name="service" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none; height: 100%;">
