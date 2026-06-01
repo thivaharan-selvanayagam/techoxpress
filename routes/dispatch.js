@@ -3,6 +3,28 @@ const router = express.Router();
 const Rider = require('../models/Rider');
 const Parcel = require('../models/Parcel');
 
+// Helper function to generate standardized Sri Lankan timestamp vectors
+const getSriLankaTiming = () => {
+  const optionsTime = {
+    timeZone: 'Asia/Colombo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  
+  const optionsDate = {
+    timeZone: 'Asia/Colombo',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  };
+
+  const currentTime = new Date().toLocaleTimeString('en-US', optionsTime);
+  const currentDate = new Date().toLocaleDateString('en-GB', optionsDate); // e.g., "01 Jun 2026"
+
+  return { currentTime, currentDate };
+};
+
 // GET: Fetch available freelance riders from MongoDB and render terminal
 router.get('/', async (req, res) => {
   try {
@@ -42,14 +64,12 @@ router.post('/add', async (req, res) => {
   const cleanId = (trackingId || '').trim().toUpperCase();
 
   try {
-    // Enforcement boundary: Block duplicates
     const duplicateCheck = await Parcel.findOne({ trackingId: cleanId });
     if (duplicateCheck) throw new Error(`Tracking sequence vector ${cleanId} already exists in registry.`);
 
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const currentDate = 'Today';
+    // Capture precise Sri Lankan timeline snapshots
+    const { currentTime, currentDate } = getSriLankaTiming();
 
-    // Build the package document based on your Mongoose Schema
     const freshParcel = new Parcel({
       trackingId: cleanId,
       sender: sender.trim(),
@@ -99,8 +119,8 @@ router.post('/commit', async (req, res) => {
     if (!targetRider) throw new Error('Selected courier driver node not found.');
     if (parsedIds.length === 0) throw new Error('Staging area clear. Scan at least one parcel.');
 
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const currentDate = 'Today';
+    // Capture precise Sri Lankan timeline snapshots
+    const { currentTime, currentDate } = getSriLankaTiming();
 
     await Parcel.updateMany(
       { trackingId: { $in: parsedIds } },
@@ -160,8 +180,8 @@ router.post('/deliver', async (req, res) => {
     const targetParcel = await Parcel.findOne({ trackingId: cleanId });
     if (!targetParcel) throw new Error('Tracking ID sequence vector not found in active registries.');
 
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const currentDate = 'Today';
+    // Capture precise Sri Lankan timeline snapshots
+    const { currentTime, currentDate } = getSriLankaTiming();
 
     targetParcel.status = 'delivered';
     targetParcel.statusLabel = 'Delivered';
