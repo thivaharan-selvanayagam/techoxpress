@@ -1,0 +1,90 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero">
+  <div class="page-hero__bg"></div>
+  <div class="page-hero__accent"></div>
+  <div class="container">
+    <div class="page-hero__label">Inbound Processing Gateway</div>
+    <h1 class="page-hero__title">PARCEL <em>INTAKE</em></h1>
+  </div>
+</section>
+
+<section class="contact-page">
+  <div class="container">
+    <div class="contact-grid" style="grid-template-columns: 1fr;">
+      
+      <div class="contact-form-box">
+        <div class="form-sub">Manifest Inception Matrix</div>
+        <h2 class="form-heading">Register New Consignment</h2>
+
+        <% if (success) { %>
+        <div class="form-alert form-alert--success" style="margin-bottom: 2rem; background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; padding: 1rem; border-radius: var(--radius); color: #2ecc71; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <%= success %>
+        </div>
+        <% } %>
+        
+        <% if (error) { %>
+        <div class="form-alert form-alert--error" style="margin-bottom: 2rem; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error %>
+        </div>
+        <% } %>
+
+        <form method="POST" action="/dispatch/add">
+          
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Generated Tracking ID Vector *</label>
+            <input 
+              type="text" 
+              name="trackingId" 
+              placeholder="e.g. TXT-2026-003" 
+              required
+              style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase; outline: none;"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Sender Origin Metrics *</label>
+              <input type="text" name="sender" placeholder="Company Name / Address" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;">
+            </div>
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Recipient Destination Target *</label>
+              <input type="text" name="recipient" placeholder="Client Name / Drop-off City" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;">
+            </div>
+          </div>
+
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Cargo Mass Dimension *</label>
+              <input type="text" name="weight" placeholder="e.g. 2.5 kg" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;">
+            </div>
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Service Urgency Protocol *</label>
+              <select name="service" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none; height: 100%;">
+                <option value="Same-Day Express">Same-Day Express</option>
+                <option value="Next-Day Delivery">Next-Day Delivery</option>
+                <option value="Standard Ground Cargo">Standard Ground Cargo</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1.1rem; background: var(--orange); color: var(--white); font-weight: bold; border: none; border-radius: var(--radius); cursor: pointer;">
+            Inject Package Into Cloud Pipeline
+          </button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center;">
+          <a href="/dispatch" style="color: var(--muted); font-family: var(--font-mono); font-size: 0.8rem; text-decoration: none; border-bottom: 1px dashed var(--border); padding-bottom: 0.2rem;">➔ Return to Fleet Dispatch Desk</a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

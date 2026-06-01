@@ -26,6 +26,69 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET: Render the New Parcel Intake Form
+router.get('/add', (req, res) => {
+  res.render('add-parcel', {
+    title: 'New Parcel Intake — Techo Xpress',
+    page: 'add-parcel',
+    success: false,
+    error: null
+  });
+});
+
+// POST: Process Intake Form and Instantiate a New Cloud Parcel Document
+router.post('/add', async (req, res) => {
+  const { trackingId, sender, recipient, weight, service } = req.body;
+  const cleanId = (trackingId || '').trim().toUpperCase();
+
+  try {
+    // Enforcement boundary: Block duplicates
+    const duplicateCheck = await Parcel.findOne({ trackingId: cleanId });
+    if (duplicateCheck) throw new Error(`Tracking sequence vector ${cleanId} already exists in registry.`);
+
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentDate = 'Today';
+
+    // Build the package document based on your Mongoose Schema
+    const freshParcel = new Parcel({
+      trackingId: cleanId,
+      sender: sender.trim(),
+      recipient: recipient.trim(),
+      weight: weight.trim(),
+      service: service,
+      status: 'transit',
+      statusLabel: 'Manifested',
+      eta: 'Pending Assignment',
+      assignedRider: null,
+      events: [{
+        time: currentTime,
+        date: currentDate,
+        label: 'Manifested',
+        desc: 'Shipment order generated via Web Intake Terminal. Cargo awaiting courier allocation.',
+        done: true
+      }]
+    });
+
+    await freshParcel.save();
+
+    res.render('add-parcel', {
+      title: 'New Parcel Intake — Techo Xpress',
+      page: 'add-parcel',
+      success: `Shipment ${cleanId} successfully registered. Vector injected into cloud dataset.`,
+      error: null
+    });
+
+  } catch (err) {
+    console.error('Intake transaction faulted:', err);
+    res.render('add-parcel', {
+      title: 'New Parcel Intake — Techo Xpress',
+      page: 'add-parcel',
+      success: false,
+      error: `Registry Rejection: ${err.message}`
+    });
+  }
+});
+
 // POST: Bind barcode tracking array metrics to the chosen Rider document
 router.post('/commit', async (req, res) => {
   const { riderId, trackingIds } = req.body;
@@ -39,7 +102,6 @@ router.post('/commit', async (req, res) => {
     const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const currentDate = 'Today';
 
-    // Atomic Update Sequence
     await Parcel.updateMany(
       { trackingId: { $in: parsedIds } },
       {
@@ -58,13 +120,12 @@ router.post('/commit', async (req, res) => {
               desc: `Package picked up and route vector mapped to freelance courier ${targetRider.name}.`,
               done: true
             }],
-            $position: 0 // Injects new logs cleanly at the top of the timeline array
+            $position: 0
           }
         }
       }
     );
 
-    // Pivot courier state to busy mode
     targetRider.status = 'In Transit';
     await targetRider.save();
 
@@ -102,12 +163,10 @@ router.post('/deliver', async (req, res) => {
     const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const currentDate = 'Today';
 
-    // 1. Shift parcel architecture metrics
     targetParcel.status = 'delivered';
     targetParcel.statusLabel = 'Delivered';
     targetParcel.eta = 'Completed';
 
-    // 2. Inject final milestone log at the top of the chronological timeline array
     targetParcel.events.unshift({
       time: currentTime,
       date: currentDate,
@@ -118,7 +177,6 @@ router.post('/deliver', async (req, res) => {
 
     await targetParcel.save();
 
-    // 3. Re-optimize the courier status back to "Available" if one was attached
     if (targetParcel.assignedRider) {
       const activeCourier = await Rider.findById(targetParcel.assignedRider);
       if (activeCourier) {
