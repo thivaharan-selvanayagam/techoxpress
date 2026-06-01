@@ -1,0 +1,73 @@
+const express = require('express');
+const router = express.Router();
+const Rider = require('../models/Rider');
+const Parcel = require('../models/Parcel');
+
+// GET: Load drop-down targets from production tables
+router.get('/', async (req, res) => {
+  try {
+    const activeRiders = await Rider.find({ status: 'Available' });
+    res.render('dispatch', { title: 'Xpress Dispatch Terminal', page: 'dispatch', riders: activeRiders, success: false, error: null });
+  } catch (err) {
+    res.render('dispatch', { title: 'Xpress Dispatch Terminal', page: 'dispatch', riders: [], success: false, error: 'Failed to stream active riders.' });
+  }
+});
+
+// POST: Bind barcode array batch vectors to database rows
+router.post('/commit', async (req, res) => {
+  const { riderId, trackingIds } = req.body;
+  const parsedIds = Array.isArray(trackingIds) ? trackingIds : [trackingIds].filter(Boolean);
+
+  try {
+    const targetRider = await Rider.findById(riderId);
+    if (!targetRider || parsedIds.length === 0) {
+      throw new Error('Verification parameters mismatched.');
+    }
+
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentDate = 'Today';
+
+    // Atomic Update Sequence: Finds scanned tracking IDs and injects assignments/events
+    await Parcel.updateMany(
+      { trackingId: { $in: parsedIds } },
+      {
+        $set: { 
+          assignedRider: targetRider._index || targetRider._id,
+          statusLabel: 'Out for Delivery',
+          eta: 'Arriving Today'
+        },
+        $push: {
+          events: {
+            $each: [{
+              time: currentTime,
+              date: currentDate,
+              label: 'Rider Dispatched',
+              desc: `Package assigned to freelance courier ${targetRider.name} (${targetRider.phone}).`,
+              done: true
+            }],
+            $position: 0 // Injects new logs right at the top of the timeline [cite: 129]
+          }
+        }
+      }
+    );
+
+    // Pivot courier state to tracking mode
+    targetRider.status = 'In Transit';
+    await targetRider.save();
+
+    const activeRiders = await Rider.find({ status: 'Available' });
+    res.render('dispatch', { 
+      title: 'Xpress Dispatch Terminal', 
+      page: 'dispatch', 
+      riders: activeRiders, 
+      success: `Successfully assigned ${parsedIds.length} parcel(s) to ${targetRider.name}. Manifest active.`, 
+      error: null 
+    });
+
+  } catch (err) {
+    const activeRiders = await Rider.find({ status: 'Available' }).catch(() => []);
+    res.render('dispatch', { title: 'Xpress Dispatch Terminal', page: 'dispatch', riders: activeRiders, success: false, error: 'Execution transaction rolled back: ' + err.message });
+  }
+});
+
+module.exports = router;

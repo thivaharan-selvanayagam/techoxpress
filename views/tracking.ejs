@@ -1,7 +1,6 @@
 <%- include('partials/head') %>
 <%- include('partials/nav') %>
 
-<!-- PAGE HERO -->
 <section class="page-hero">
   <div class="page-hero__bg"></div>
   <div class="page-hero__accent"></div>
@@ -11,12 +10,10 @@
   </div>
 </section>
 
-<!-- TRACKING SECTION -->
 <section class="tracking-page">
   <div class="container">
     <div class="tracking-wrap">
 
-      <!-- Search Form -->
       <div class="track-box">
         <div class="track-box__title">Enter Tracking ID</div>
         <div class="track-box__sub">Your tracking ID was sent via SMS and email when your package was collected. Format: TXT-YYYY-XXX</div>
@@ -39,7 +36,6 @@
         </form>
       </div>
 
-      <!-- Error -->
       <% if (error) { %>
       <div class="track-alert track-alert--error">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -47,7 +43,6 @@
       </div>
       <% } %>
 
-      <!-- Result -->
       <% if (order) { %>
       <div class="result-card">
 
@@ -78,6 +73,20 @@
           <div>
             <div class="meta-item__lbl">Service</div>
             <div class="meta-item__val"><%= order.service %></div>
+          </div>
+          
+          <div style="grid-column: span 2;">
+            <div class="meta-item__lbl">Courier Handler Profile</div>
+            <div class="meta-item__val">
+              <% if (order.assignedRider) { %>
+                <span style="color: var(--white); font-weight: 700;"><%= order.assignedRider.name %></span>
+                <div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; font-family: var(--font-mono); letter-spacing: 0.02em;">
+                  📞 Contact: <%= order.assignedRider.phone %> &nbsp;·&nbsp; Transit Element: [<%= order.assignedRider.vehicle %>]
+                </div>
+              <% } else { %>
+                <span style="color: var(--orange); font-style: italic; font-weight: 500;">📡 Broadcasting to available freelance couriers...</span>
+              <% } %>
+            </div>
           </div>
         </div>
 
@@ -112,7 +121,6 @@
       </div>
       <% } %>
 
-      <!-- Tips (when no result) -->
       <% if (!order) { %>
       <div class="track-tips">
         <h4>Where to Find Your Tracking ID</h4>

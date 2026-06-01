@@ -132,7 +132,7 @@ await transporter.sendMail({
 
 ## Part of the Techo Ecosystem
 
-- **Techo Traders** — Parent company: `techotraders.com`
+- **Techo Traders** — Parent company: `techotraders.com.lk`
 - **Techo Labs** — Digital & marketing arm
 - **Techo Xpress** — This site (logistics)
 - **Techo Connect** — Antenna & hardware
