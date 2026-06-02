@@ -5,111 +5,125 @@
   <div class="page-hero__bg"></div>
   <div class="page-hero__accent"></div>
   <div class="container">
-    <div class="page-hero__label">Hub Overwatch Terminal</div>
-    <h1 class="page-hero__title">CARGO & FLEET<br><em>MANAGEMENT.</em></h1>
+    <div class="page-hero__label">Overwatch Logistics Terminal</div>
+    <h1 class="page-hero__title">FLEET OPERATIONAL<br><em>COMMAND & AUDIT.</em></h1>
   </div>
 </section>
 
-<section class="contact-page">
-  <div class="container">
-    <div class="contact-grid" style="grid-template-columns: 1fr;">
+<section class="contact-page" style="padding-top: 2rem;">
+  <div class="container" style="max-width: 1400px;">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;">
       
-      <div class="contact-form-box">
-        <div class="form-sub">Fleet Assignment Engine</div>
-        <h2 class="form-heading">Barcode Manifest Terminal</h2>
-
-        <% if (success) { %>
-        <div class="form-alert form-alert--success" style="margin-bottom: 2rem; background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; padding: 1rem; border-radius: var(--radius); color: #2ecc71; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          <%= success %>
-        </div>
-        <% } %>
-        
-        <% if (error) { %>
-        <div class="form-alert form-alert--error" style="margin-bottom: 2rem; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <%= error %>
-        </div>
-        <% } %>
-
-        <form id="dispatchForm" method="POST" action="/dispatch/commit">
+      <div>
+        <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border);">
+          <div class="form-sub" style="color: var(--orange);">Shift Phase I</div>
+          <h2 class="form-heading" style="font-size: 1.8rem; margin-bottom: 1.5rem;">Outbound Hub Manifest</h2>
           
-          <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label for="riderSelect" style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Select Target Freelance Courier Unit *</label>
-            <select id="riderSelect" name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); letter-spacing: 0.05em; outline: none;">
-              <option value="">-- SELECT AVAILABLE COURIER PROFILE --</option>
-              <% riders.forEach(rider => { %>
-                <option value="<%= rider._id %>">
-                  <%= rider.name %> ➔ 📞 <%= rider.phone %> [<%= rider.vehicle %>]
-                </option>
-              <% }) %>
-            </select>
-          </div>
-
-          <div class="form-group" style="margin-top: 2.5rem; margin-bottom: 1.5rem;">
-            <label for="barcodeScannerInput" style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Hardware Barcode Scanner Interface</label>
-            <input 
-              type="text" 
-              id="barcodeScannerInput" 
-              placeholder="Focus cursor here and scan parcel tracking barcodes..." 
-              style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid rgba(212, 79, 10, 0.3); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); font-size: 1.1rem; text-transform: uppercase; outline: none;"
-              autocomplete="off"
-            >
-            <small style="color: var(--muted); display: block; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem;">
-              SYSTEM ENGINE NOTE: Laser guns automatically trigger an execution [ENTER] trailing code block command loop.
-            </small>
-          </div>
-
-          <div style="margin: 2.5rem 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
-            <div class="form-sub" style="margin-bottom: 1rem; color: var(--white); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
-              Manifest Blueprint Staging Matrix (<span id="scanCount" style="color: var(--orange); font-weight: bold;">0</span> packages loaded)
-            </div>
+          <form id="dispatchForm" method="POST" action="/dispatch/commit">
             
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.9rem;">
-              <thead>
-                <tr style="border-bottom: 2px solid var(--border); color: var(--muted);">
-                  <th style="padding: 0.75rem 0.5rem;">Index</th>
-                  <th style="padding: 0.75rem 0.5rem;">Tracking Sequence Vector</th>
-                  <th style="padding: 0.75rem 0.5rem; text-align: right;">Action Boundary</th>
-                </tr>
-              </thead>
-              <tbody id="manifestQueueBody">
-                <tr id="emptyRowState">
-                  <td colspan="3" style="padding: 2.5rem; text-align: center; color: var(--muted); font-style: italic;">
-                    Staging pipeline empty. Intercept cargo stickers to compile data rows.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1.1rem; font-size: 1.05rem; background: var(--orange); color: var(--white); border: none; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
-            Commit Manifest & Dispatch Freelancer
-          </button>
-        </form>
-
-        <div class="contact-form-box" style="margin-top: 4rem; border-top: 2px dashed var(--border); padding-top: 3rem; background: transparent; padding-left: 0; padding-right: 0; box-shadow: none;">
-          <div class="form-sub" style="color: #2ecc71;">Debrief Gate</div>
-          <h3 class="form-heading" style="font-size: 1.5rem; margin-bottom: 1rem;">Arrival Handover Confirmation</h3>
-          <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Type or scan an active in-transit barcode to execute a delivery closure handshake.</p>
-          
-          <form method="POST" action="/dispatch/deliver">
-            <div class="form-group">
-              <input 
-                type="text" 
-                name="trackingId" 
-                placeholder="e.g. TXT-2026-001" 
-                required
-                style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase; outline: none;"
-                autocomplete="off"
-              >
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Courier Target Unit</label>
+              <select id="riderSelect" name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono);">
+                <option value="">-- CHOOSE AVAILABLE RIDER POOL --</option>
+                <% riders.forEach(rider => { %>
+                  <option value="<%= rider._id %>">
+                    <%= rider.name %> [<%= rider.vehicle %>] ➔ 💰 Outstanding Debt: LKR <%= (rider.pendingBalance || 0).toLocaleString() %>
+                  </option>
+                <% }) %>
+              </select>
             </div>
-            <button type="submit" class="track-btn" style="width: 100%; margin-top: 1rem; justify-content: center; background: #2ecc71; color: var(--white); font-weight: bold; border: none; padding: 1rem; border-radius: var(--radius); cursor: pointer;">
-              Confirm Successful Handover Delivery
-            </button>
+
+            <div class="form-group" style="margin-top: 2rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Barcode Interceptor</label>
+              <input type="text" id="barcodeScannerInput" placeholder="Click here and scan outgoing parcel stickers..." style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid rgba(212, 79, 10, 0.4); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase;" autocomplete="off">
+            </div>
+
+            <div style="margin: 2rem 0; background: var(--bg); padding: 1rem; border-radius: var(--radius); border: 1px solid var(--border);">
+              <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem;">Outbound Load Queue (<span id="scanCount" style="color:var(--orange); font-weight:bold;">0</span> Staged)</div>
+              <table style="width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem; color: var(--white);">
+                <tbody id="manifestQueueBody">
+                  <tr id="emptyRowState"><td style="padding: 1.5rem; text-align: center; color: var(--muted); font-style: italic;">Staging grid clear. Run scanner beams to pack rows.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1rem; background: var(--orange); color: var(--white); border: none; font-weight: bold; border-radius: var(--radius); cursor: pointer;">Commit Manifest & Authorize Transit</button>
           </form>
         </div>
 
+        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem;">
+          <h3 style="font-size: 1.1rem; color: var(--white); font-family: var(--font-mono); text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">🚨 Outstanding Ledger Registry</h3>
+          <div style="max-height: 250px; overflow-y: auto;">
+            <% allRiders.forEach(r => { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: var(--font-mono); font-size: 0.85rem;">
+                <span style="color: var(--white);"><%= r.name %></span>
+                <% if (r.pendingBalance > 0) { %>
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="color: #e74c3c; font-weight: bold;">LKR <%= r.pendingBalance.toLocaleString() %></span>
+                    <form method="POST" action="/dispatch/clear-balance">
+                      <input type="hidden" name="riderId" value="<%= r._id %>">
+                      <button type="submit" style="background: #2ecc71; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">Cash Received</button>
+                    </form>
+                  </div>
+                <% } else { %>
+                  <span style="color: #2ecc71;">✅ Balanced (0)</span>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="form-sub" style="color: #2ecc71; margin-bottom: 0.5rem;">Shift Phase II</div>
+        <h2 style="color: var(--white); font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; font-family: var(--font-heading);">Active Transit Monitor</h2>
+
+        <% if (dynamicFleet.length === 0) { %>
+          <div style="padding: 4rem 2rem; background: var(--bg-card); border: 2px dashed var(--border); border-radius: var(--radius); text-align: center; color: var(--muted); font-style: italic;">
+            All units returned. No courier drivers currently in-transit vectors.
+          </div>
+        <% } %>
+
+        <% dynamicFleet.forEach(({ rider, activePackages }) => { %>
+          <div class="contact-form-box" style="margin-bottom: 2rem; background: #111; border: 1px solid #e74c3c; padding: 1.5rem; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+              <div>
+                <h3 style="color: var(--white); font-size: 1.3rem; margin: 0;"><%= rider.name %></h3>
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">🚚 Vehicle Element: [<%= rider.vehicle %>]</span>
+              </div>
+              <span style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid #e74c3c; font-family: var(--font-mono); font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: bold; text-transform: uppercase;">In Transit</span>
+            </div>
+
+            <div style="margin-bottom: 1.5rem; max-height: 120px; overflow-y: auto; background: var(--bg); padding: 0.8rem; border-radius: var(--radius); font-family: var(--font-mono); font-size: 0.8rem; border: 1px solid var(--border);">
+              <div style="color: var(--muted); font-size: 0.7rem; margin-bottom: 0.4rem; text-transform: uppercase;">Assigned Cargo Bag Documents:</div>
+              <% activePackages.forEach(p => { %>
+                <div style="display: flex; justify-content: space-between; color: var(--white); padding: 0.2rem 0;">
+                  <span>📦 <%= p.trackingId %></span>
+                  <span style="color: var(--muted);"><%= p.recipient %> (LKR <%= p.codPrice %>)</span>
+                </div>
+              <% }) %>
+            </div>
+
+            <form method="POST" action="/dispatch/close-route" id="closeForm_<%= rider._id %>">
+              <input type="hidden" name="riderId" value="<%= rider._id %>">
+              
+              <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.3rem; color: #2ecc71; font-size: 0.75rem; font-family: var(--font-mono); text-transform: uppercase;">Scan Retained / Un-delivered Items:</label>
+                <input type="text" class="return-entry-field" data-rider="<%= rider._id %>" placeholder="Scan exception barcodes here..." style="width: 100%; padding: 0.8rem; background: var(--bg); border: 1px solid #2ecc71; border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase; font-size: 0.9rem;" autocomplete="off">
+              </div>
+
+              <div style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 0.5rem; border: 1px dashed var(--border);">
+                <div style="font-size: 0.7rem; font-family: var(--font-mono); color: #2ecc71; text-transform: uppercase; margin-bottom: 0.3rem;">Scanned Bag Return Vectors:</div>
+                <div id="returnStaging_<%= rider._id %>" style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem; color: white; min-height: 25px; align-items: center;">
+                  <span style="color: var(--muted); font-style: italic;">No exceptions loaded. Everything will pass as DELIVERED.</span>
+                </div>
+              </div>
+
+              <button type="submit" style="width: 100%; justify-content: center; background: #e74c3c; color: white; font-weight: bold; border: none; padding: 0.9rem; border-radius: var(--radius); cursor: pointer; font-family: var(--font-mono); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.02em;">Close Dispatch & Run Financial Audit</button>
+            </form>
+          </div>
+        <% }) %>
       </div>
 
     </div>
@@ -118,72 +132,74 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  // Outbound Manifest Logic (Morning Shift)
   const scannerInput = document.getElementById('barcodeScannerInput');
   const queueBody = document.getElementById('manifestQueueBody');
   const emptyRowState = document.getElementById('emptyRowState');
   const scanCountDisplay = document.getElementById('scanCount');
-  const formElement = document.getElementById('dispatchForm');
-  
   let scannedSet = new Set();
 
-  scannerInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault(); // Intercept scanner key loop to prevent empty web postings
-      
-      const trackingId = scannerInput.value.trim().toUpperCase();
-      scannerInput.value = ''; // Instantly clear scanner beam memory cache
-      
-      if (!trackingId) return;
+  if (scannerInput) {
+    scannerInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const trackingId = scannerInput.value.trim().toUpperCase();
+        scannerInput.value = '';
+        if (!trackingId) return;
 
-      if (scannedSet.has(trackingId)) {
-        alert(`Read Matrix Error: ${trackingId} is already staged inside this manifest sequence.`);
-        return;
-      }
-
-      if (scannedSet.size === 0 && emptyRowState) {
-        emptyRowState.remove();
-      }
-
-      scannedSet.add(trackingId);
-      scanCountDisplay.textContent = scannedSet.size;
-
-      const row = document.createElement('tr');
-      row.id = `row_${trackingId}`;
-      row.style.borderBottom = '1px solid var(--border)';
-      row.style.color = 'var(--white)';
-      
-      row.innerHTML = `
-        <td style="padding: 0.85rem 0.5rem; color: var(--orange); font-weight: bold;">#${scannedSet.size}</td>
-        <td style="padding: 0.85rem 0.5rem; letter-spacing: 0.05em;">
-          ${trackingId}
-          <input type="hidden" name="trackingIds" value="${trackingId}">
-        </td>
-        <td style="padding: 0.85rem 0.5rem; text-align: right;">
-          <button type="button" class="remove-btn" data-id="${trackingId}" style="color: var(--muted); background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem;">✕ Remove</button>
-        </td>
-      `;
-      
-      const removeBtn = row.querySelector('.remove-btn');
-      removeBtn.addEventListener('click', function() {
-        const idToRemove = this.getAttribute('data-id');
-        document.getElementById(`row_${idToRemove}`).remove();
-        scannedSet.delete(idToRemove);
-        scanCountDisplay.textContent = scannedSet.size;
-        
-        if (scannedSet.size === 0) {
-          queueBody.appendChild(emptyRowState);
+        if (scannedSet.has(trackingId)) {
+          alert(`Duplicate Input Error: ${trackingId} is already staged.`);
+          return;
         }
-      });
+        if (scannedSet.size === 0 && emptyRowState) emptyRowState.remove();
 
-      queueBody.appendChild(row);
-    }
-  });
+        scannedSet.add(trackingId);
+        scanCountDisplay.textContent = scannedSet.size;
 
-  formElement.addEventListener('submit', (e) => {
-    if (scannedSet.size === 0) {
-      e.preventDefault();
-      alert('Validation Boundary Failure: Staging area empty. Scan at least one parcel before dispatching.');
-    }
+        const row = document.createElement('tr');
+        row.id = `row_${trackingId}`;
+        row.innerHTML = `
+          <td style="padding: 0.5rem 0; color: var(--orange); font-weight: bold;">#${scannedSet.size}</td>
+          <td style="padding: 0.5rem 0;">${trackingId}<input type="hidden" name="trackingIds" value="${trackingId}"></td>
+          <td style="padding: 0.5rem 0; text-align: right;"><button type="button" onclick="document.getElementById('row_${trackingId}').remove(); scannedSet.delete('${trackingId}'); document.getElementById('scanCount').textContent=scannedSet.size;" style="background:none; border:none; color:var(--muted); cursor:pointer;">✕ Remove</button></td>
+        `;
+        queueBody.appendChild(row);
+      }
+    });
+  }
+
+  // Inbound Returns Matrix Interceptor (Evening Shift Exception Protocol)
+  const returnFields = document.querySelectorAll('.return-entry-field');
+  returnFields.forEach(field => {
+    field.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const trackingId = this.value.trim().toUpperCase();
+        const riderId = this.getAttribute('data-rider');
+        this.value = '';
+        if (!trackingId) return;
+
+        const container = document.getElementById(`returnStaging_${riderId}`);
+        const form = document.getElementById(`closeForm_${riderId}`);
+        
+        // Remove helper empty text block if it is the first scan
+        if (container.textContent.includes("No exceptions loaded")) {
+          container.innerHTML = '';
+        }
+
+        // Avoid double inclusion checks
+        if (form.querySelector(`input[value="${trackingId}"]`)) {
+          alert('Exception ID already staged inside this card block.');
+          return;
+        }
+
+        // Render visible badge
+        const badge = document.createElement('span');
+        badge.style.cssText = "background: rgba(231,76,60,0.2); border: 1px solid #e74c3c; padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.3rem;";
+        badge.innerHTML = `⚠️ ${trackingId} <input type="hidden" name="remainingIds" value="${trackingId}">`;
+        container.appendChild(badge);
+      }
+    });
   });
 });
 </script>
