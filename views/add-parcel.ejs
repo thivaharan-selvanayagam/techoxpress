@@ -34,16 +34,31 @@
 
         <form method="POST" action="/dispatch/add">
           
-          <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Generated Tracking ID Vector *</label>
-            <input 
-              type="text" 
-              name="trackingId" 
-              placeholder="e.g. TXT-2026-003" 
-              required
-              style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase; outline: none;"
-              autocomplete="off"
-            >
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Generated Tracking ID Vector *</label>
+              <input 
+                type="text" 
+                name="trackingId" 
+                placeholder="e.g. TXT-2026-003" 
+                required
+                style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); text-transform: uppercase; outline: none;"
+                autocomplete="off"
+              >
+            </div>
+            
+            <div class="form-group">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">COD Collection Amount (LKR) *</label>
+              <input 
+                type="number" 
+                name="codPrice" 
+                placeholder="e.g. 2500 (Enter 0 if Prepaid)" 
+                min="0"
+                required
+                style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;"
+                autocomplete="off"
+              >
+            </div>
           </div>
 
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
@@ -237,7 +252,6 @@
           </div>
 
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
-            
             <div class="form-group">
               <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Cargo Mass Dimension *</label>
               <select name="weight" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none; height: 100%; font-family: var(--font-mono);">
