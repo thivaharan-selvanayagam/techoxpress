@@ -59,6 +59,14 @@
 
         <div class="result-card__meta">
           <div>
+            <div class="meta-item__lbl">From</div>
+            <div class="meta-item__val"><%= order.sender %></div>
+          </div>
+          <div>
+            <div class="meta-item__lbl">To</div>
+            <div class="meta-item__val"><%= order.recipient %></div>
+          </div>
+          <div>
             <div class="meta-item__lbl">Weight</div>
             <div class="meta-item__val"><%= order.weight %></div>
           </div>
@@ -67,14 +75,16 @@
             <div class="meta-item__val"><%= order.service %></div>
           </div>
           
-          <div style="grid-column: span 2;">
-            <div class="meta-item__lbl">Payment Collection Mode</div>
-            <div class="meta-item__val" style="font-weight: 700; color: <%= order.codPrice > 0 ? 'var(--orange)' : '#2ecc71' %>;">
-              <%= order.codPrice > 0 ? 'Cash On Delivery: LKR ' + order.codPrice.toLocaleString() : '✅ Paid / Free Handover Package' %>
+          <div style="grid-column: span 2; border-top: 1px dashed var(--border); margin-top: 0.5rem; padding-top: 0.8rem;">
+            <div class="meta-item__lbl" style="color: var(--orange);">Financial Ledger Handshake</div>
+            <div class="meta-item__val" style="font-size: 0.85rem; font-family: var(--font-mono); line-height: 1.4rem; margin-top: 0.2rem;">
+              💵 COD Total Collection: <span style="color: var(--white); font-weight: bold;">LKR <%= (order.codPrice || 0).toLocaleString() %></span><br>
+              🏍️ Rider Commission Cut: <span style="color: #2ecc71;">LKR <%= (order.commission || 0).toLocaleString() %></span><br>
+              🏢 Due Back to Office: <span style="color: var(--orange);">LKR <%= Math.max(0, (order.codPrice || 0) - (order.commission || 0)).toLocaleString() %></span>
             </div>
           </div>
           
-          <div style="grid-column: span 2;">
+          <div style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 0.5rem;">
             <div class="meta-item__lbl">Courier Handler Profile</div>
             <div class="meta-item__val">
               <% if (order.assignedRider) { %>
