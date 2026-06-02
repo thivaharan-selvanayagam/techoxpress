@@ -20,7 +20,7 @@ const getSriLankaTiming = () => {
   };
 
   const currentTime = new Date().toLocaleTimeString('en-US', optionsTime);
-  const currentDate = new Date().toLocaleDateString('en-GB', optionsDate); // e.g., "01 Jun 2026"
+  const currentDate = 'Today'; // Keeps timeline clean relative to intake loops
 
   return { currentTime, currentDate };
 };
@@ -60,7 +60,8 @@ router.get('/add', (req, res) => {
 
 // POST: Process Intake Form and Instantiate a New Cloud Parcel Document
 router.post('/add', async (req, res) => {
-  const { trackingId, sender, recipient, weight, service } = req.body;
+  // 👈 Grab codPrice from incoming form payload parameters
+  const { trackingId, sender, recipient, weight, service, codPrice } = req.body;
   const cleanId = (trackingId || '').trim().toUpperCase();
 
   try {
@@ -76,6 +77,7 @@ router.post('/add', async (req, res) => {
       recipient: recipient.trim(),
       weight: weight.trim(),
       service: service,
+      codPrice: Number(codPrice) || 0, // 👈 Safely type-cast and assign numeric value
       status: 'transit',
       statusLabel: 'Manifested',
       eta: 'Pending Assignment',
@@ -94,7 +96,7 @@ router.post('/add', async (req, res) => {
     res.render('add-parcel', {
       title: 'New Parcel Intake — Techo Xpress',
       page: 'add-parcel',
-      success: `Shipment ${cleanId} successfully registered. Vector injected into cloud dataset.`,
+      success: `Shipment ${cleanId} successfully registered with COD price of LKR ${Number(codPrice).toLocaleString()}. Vector injected into cloud dataset.`,
       error: null
     });
 
