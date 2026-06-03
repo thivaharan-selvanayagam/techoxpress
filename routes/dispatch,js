@@ -83,6 +83,91 @@ router.get('/add', (req, res) => {
   res.render('add-parcel', { title: 'New Parcel Intake — Techo Xpress', page: 'add-parcel', success: false, error: null });
 });
 
+// GET: Render the Rider Performance Reports Selection Console
+router.get('/report', async (req, res) => {
+  try {
+    const ridersList = await Rider.find({});
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: ridersList,
+      reportData: null,
+      success: false,
+      error: null
+    });
+  } catch (err) {
+    res.status(500).send("Report Subsystem Engine Failure.");
+  }
+});
+
+// POST: Query, Process, and Calculate Metrics for Selected Rider and Date Range
+router.post('/report', async (req, res) => {
+  const { riderId, startDate, endDate } = req.body;
+
+  try {
+    const ridersList = await Rider.find({});
+    const chosenRider = await Rider.findById(riderId);
+    if (!chosenRider) throw new Error("Selected rider profile not found in database registries.");
+
+    // Lock date limits strictly matching Sri Lankan Midnight offsets (+05:30)
+    const absoluteStart = new Date(startDate + "T00:00:00+05:30");
+    const absoluteEnd = new Date(endDate + "T23:59:59+05:30");
+
+    // Fetch all successfully completed matching parcel parameters
+    const deliveredParcels = await Parcel.find({
+      assignedRider: riderId,
+      status: 'delivered',
+      updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
+    });
+
+    // Run Accounting Algorithms
+    let totalCommissionEarned = 0;
+    let totalCollectedCOD = 0;
+
+    deliveredParcels.forEach(parcel => {
+      let itemComm = Number(parcel.commission);
+      if (!itemComm || itemComm === 0) {
+        const lookupKey = (parcel.recipient || '').trim().toLowerCase();
+        itemComm = cityCommissions[lookupKey] || 150;
+      }
+      totalCommissionEarned += itemComm;
+      totalCollectedCOD += (parcel.codPrice || 0);
+    });
+
+    const reportData = {
+      riderName: chosenRider.name,
+      vehicle: chosenRider.vehicle,
+      startStr: startDate,
+      endStr: endDate,
+      totalDelivered: deliveredParcels.length,
+      totalCommission: totalCommissionEarned,
+      totalCOD: totalCollectedCOD,
+      parcels: deliveredParcels
+    };
+
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: ridersList,
+      reportData,
+      success: `Performance matrix compiled for courier ${chosenRider.name}.`,
+      error: null
+    });
+
+  } catch (err) {
+    console.error(err);
+    const fallbackRiders = await Rider.find({}).catch(() => []);
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: fallbackRiders,
+      reportData: null,
+      success: false,
+      error: `Report Generation Terminated: ${err.message}`
+    });
+  }
+});
+
 // POST: Process Intake Form and Instantiate a New Cloud Parcel Document
 router.post('/add', async (req, res) => {
   const { trackingId, sender, recipient, weight, service, codPrice } = req.body;
@@ -153,21 +238,18 @@ router.post('/close-route', async (req, res) => {
 
     for (let parcel of activeParcels) {
       if (upperRemaining.includes(parcel.trackingId.toUpperCase())) {
-        // Exception Match: Returned item
         parcel.assignedRider = null;
         parcel.statusLabel = 'Returned to Hub';
         parcel.eta = 'Pending Re-assignment';
         parcel.events.unshift({ time: currentTime, date: currentDate, label: 'Delivery Failed', desc: 'Returned back to gateway inventory stacks.', done: true });
         await parcel.save();
       } else {
-        // Exception Absence: Delivered item!
         parcel.status = 'delivered';
         parcel.statusLabel = 'Delivered';
         parcel.eta = 'Completed';
         parcel.events.unshift({ time: currentTime, date: currentDate, label: 'Delivered', desc: 'Delivery verification check-out completed.', done: true });
         await parcel.save();
 
-        // ── 🔒 DOUBLE-LOCK FALLBACK LOOKUP ENGINE ──
         let itemCommission = Number(parcel.commission);
         if (!itemCommission || itemCommission === 0) {
           const searchCityKey = (parcel.recipient || '').trim().toLowerCase();
@@ -179,15 +261,11 @@ router.post('/close-route', async (req, res) => {
       }
     }
 
-    // Accounting equation
     const sessionOutstandingDebt = Math.max(0, collectedCOD - totalRiderCommission);
 
-    // Roll balance over into permanent ledger memory file
     rider.pendingBalance += sessionOutstandingDebt;
     rider.status = 'Available';
     await rider.save();
-
-    console.log(`[LEDGER LOG] Rider: ${rider.name} | COD: LKR ${collectedCOD} | Comm: LKR ${totalRiderCommission} | Added Debt: LKR ${sessionOutstandingDebt}`);
 
     res.redirect('/dispatch');
   } catch (err) {
