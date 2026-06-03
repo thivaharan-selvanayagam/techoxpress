@@ -15,11 +15,16 @@
     </a>
 
     <nav class="site-nav__links">
-      <a href="/"         class="<%= page==='home'     ? 'is-active':'' %>">Home</a>
-      <a href="/services" class="<%= page==='services' ? 'is-active':'' %>">Services</a>
-      <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
-      <a href="/about"    class="<%= page==='about'    ? 'is-active':'' %>">About</a>
-      <a href="/contact"  class="site-nav__cta">Get a Quote</a>
+      <a href="/"              class="<%= page==='home'       ? 'is-active':'' %>">Home</a>
+      <a href="/services"      class="<%= page==='services'   ? 'is-active':'' %>">Services</a>
+      <a href="/tracking"      class="<%= page==='tracking'   ? 'is-active':'' %>">Track Shipment</a>
+      
+      <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
+      <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
+      <a href="/dispatch/report" class="<%= page==='report'     ? 'is-active':'' %>">Ledger Reports</a>
+      
+      <a href="/about"         class="<%= page==='about'      ? 'is-active':'' %>">About</a>
+      <a href="/contact"       class="site-nav__cta">Get a Quote</a>
     </nav>
 
     <button class="site-nav__burger" id="navBurger" aria-label="Open menu">
@@ -29,11 +34,16 @@
 
   <div class="site-nav__drawer" id="navDrawer">
     <button class="site-nav__drawer-close" id="navClose" aria-label="Close menu">✕</button>
-    <a href="/">Home</a>
-    <a href="/services">Services</a>
-    <a href="/tracking">Track Shipment</a>
-    <a href="/about">About</a>
-    <a href="/contact">Get a Quote</a>
+    <a href="/"              class="<%= page==='home'       ? 'is-active':'' %>">Home</a>
+    <a href="/services"      class="<%= page==='services'   ? 'is-active':'' %>">Services</a>
+    <a href="/tracking"      class="<%= page==='tracking'   ? 'is-active':'' %>">Track Shipment</a>
+    
+    <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
+    <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
+    <a href="/dispatch/report" class="<%= page==='report'     ? 'is-active':'' %>">Ledger Reports</a>
+    
+    <a href="/about"         class="<%= page==='about'      ? 'is-active':'' %>">About</a>
+    <a href="/contact"       style="margin-top: 1rem; text-align: center; display: block; background: var(--orange); color: white; padding: 0.8rem; border-radius: var(--radius); font-weight: bold; text-decoration: none;">Get a Quote</a>
   </div>
   <div class="site-nav__overlay" id="navOverlay"></div>
 </header>
