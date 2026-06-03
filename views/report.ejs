@@ -22,7 +22,7 @@
           
           <div class="form-group">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">Select Target Rider unit *</label>
-            <select name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono);">
+            <select name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
               <option value="">-- CHOOSE COURIER UNIT FOR AUDIT --</option>
               <% riders.forEach(r => { %>
                 <option value="<%= r._id %>"><%= r.name %> [<%= r.vehicle %>]</option>
@@ -31,12 +31,12 @@
           </div>
 
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">Start Date Boundary *</label>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">Start Date *</label>
             <input type="date" name="startDate" required style="width: 100%; padding: 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
           </div>
 
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">End Date Boundary *</label>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">End Date *</label>
             <input type="date" name="endDate" required style="width: 100%; padding: 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
           </div>
 
@@ -54,7 +54,7 @@
         <div style="margin-bottom: 2rem; border-left: 4px solid var(--orange); padding-left: 1rem;">
           <h2 style="color: white; margin: 0; font-size: 2rem;"><%= reportData.riderName %></h2>
           <p style="color: var(--muted); font-family: var(--font-mono); font-size: 0.9rem; margin-top: 0.2rem;">
-            📅 Statement Timeline Window: <span style="color: var(--white); font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: var(--white); font-weight: bold;"><%= reportData.endStr %></span> (Asia/Colombo)
+            📅 Timeline Window: <span style="color: var(--white); font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: var(--white); font-weight: bold;"><%= reportData.endStr %></span> (Asia/Colombo)
           </p>
         </div>
 
@@ -71,7 +71,7 @@
           </div>
 
           <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center;">
-            <div style="color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">3. Total COD Collected</div>
+            <div style="color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">3. Total COD Cash Collected</div>
             <div style="font-size: 2.2rem; font-weight: 800; color: var(--white); font-family: var(--font-mono);">LKR <%= reportData.totalCOD.toLocaleString() %></div>
           </div>
 
@@ -87,7 +87,7 @@
               <thead>
                 <tr style="border-bottom: 2px solid var(--border); color: var(--muted); text-transform: uppercase; font-size: 0.75rem;">
                   <th style="padding: 0.8rem;">Tracking ID</th>
-                  <th style="padding: 0.8rem;">Destination City</th>
+                  <th style="padding: 0.8rem;">Destination Target</th>
                   <th style="padding: 0.8rem;">COD Value</th>
                   <th style="padding: 0.8rem; text-align: right;">Commission Paid</th>
                 </tr>
