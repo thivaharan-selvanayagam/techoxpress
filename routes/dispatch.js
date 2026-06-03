@@ -58,7 +58,6 @@ router.get('/', async (req, res) => {
     const allRiders = await Rider.find({});
     const transitRiders = await Rider.find({ status: 'In Transit' });
     
-    // For each transit rider, append their active parcel profiles dynamically
     const dynamicFleet = await Promise.all(transitRiders.map(async (rider) => {
       const activePackages = await Parcel.find({ assignedRider: rider._id, status: 'transit' });
       return { rider, activePackages };
@@ -67,8 +66,8 @@ router.get('/', async (req, res) => {
     res.render('dispatch', { 
       title: 'Xpress Dispatch Terminal', 
       page: 'dispatch', 
-      riders: allRiders.filter(r => r.status === 'Available'), // Dropdown selection pool
-      allRiders: allRiders, // Comprehensive state overview logs
+      riders: allRiders.filter(r => r.status === 'Available'), 
+      allRiders: allRiders, 
       dynamicFleet,
       success: false, 
       error: null 
@@ -84,7 +83,92 @@ router.get('/add', (req, res) => {
   res.render('add-parcel', { title: 'New Parcel Intake — Techo Xpress', page: 'add-parcel', success: false, error: null });
 });
 
-// POST: Add new parcel profile rows
+// GET: Render the Rider Performance Reports Selection Console
+router.get('/report', async (req, res) => {
+  try {
+    const ridersList = await Rider.find({});
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: ridersList,
+      reportData: null,
+      success: false,
+      error: null
+    });
+  } catch (err) {
+    res.status(500).send("Report Subsystem Engine Failure.");
+  }
+});
+
+// POST: Query, Process, and Calculate Metrics for Selected Rider and Date Range
+router.post('/report', async (req, res) => {
+  const { riderId, startDate, endDate } = req.body;
+
+  try {
+    const ridersList = await Rider.find({});
+    const chosenRider = await Rider.findById(riderId);
+    if (!chosenRider) throw new Error("Selected rider profile not found in database registries.");
+
+    // Lock date limits strictly matching Sri Lankan Midnight offsets (+05:30)
+    const absoluteStart = new Date(startDate + "T00:00:00+05:30");
+    const absoluteEnd = new Date(endDate + "T23:59:59+05:30");
+
+    // Fetch all successfully completed matching parcel parameters
+    const deliveredParcels = await Parcel.find({
+      assignedRider: riderId,
+      status: 'delivered',
+      updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
+    });
+
+    // Run Accounting Algorithms
+    let totalCommissionEarned = 0;
+    let totalCollectedCOD = 0;
+
+    deliveredParcels.forEach(parcel => {
+      let itemComm = Number(parcel.commission);
+      if (!itemComm || itemComm === 0) {
+        const lookupKey = (parcel.recipient || '').trim().toLowerCase();
+        itemComm = cityCommissions[lookupKey] || 150;
+      }
+      totalCommissionEarned += itemComm;
+      totalCollectedCOD += (parcel.codPrice || 0);
+    });
+
+    const reportData = {
+      riderName: chosenRider.name,
+      vehicle: chosenRider.vehicle,
+      startStr: startDate,
+      endStr: endDate,
+      totalDelivered: deliveredParcels.length,
+      totalCommission: totalCommissionEarned,
+      totalCOD: totalCollectedCOD,
+      parcels: deliveredParcels
+    };
+
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: ridersList,
+      reportData,
+      success: `Performance matrix compiled for courier ${chosenRider.name}.`,
+      error: null
+    });
+
+  } catch (err) {
+    console.error(err);
+    const fallbackRiders = await Rider.find({}).catch(() => []);
+    res.render('report', {
+      title: 'Rider Metrics Report — Techo Xpress',
+      page: 'report',
+      riders: fallbackRiders,
+      reportData: null,
+      success: false,
+      error: `Report Generation Terminated: ${err.message}`
+    });
+  }
+});
+
+// POST: Process Intake Form and Instantiate a New Cloud Parcel Document
 router.post('/add', async (req, res) => {
   const { trackingId, sender, recipient, weight, service, codPrice } = req.body;
   const cleanId = (trackingId || '').trim().toUpperCase();
@@ -100,7 +184,7 @@ router.post('/add', async (req, res) => {
       trackingId: cleanId, sender: sender.trim(), recipient: recipient.trim(), weight: weight.trim(), service,
       codPrice: Number(codPrice) || 0, commission: assignedCommission, status: 'transit', statusLabel: 'Manifested',
       eta: 'Pending Assignment', assignedRider: null,
-      events: [{ time: currentTime, date: currentDate, label: 'Manifested', desc: 'Shipment entry logged at hub.', done: true }]
+      events: [{ time: currentTime, date: currentDate, label: 'Manifested', desc: `Shipment entry logged at hub. Commission set: LKR ${assignedCommission}`, done: true }]
     });
 
     await freshParcel.save();
@@ -150,40 +234,42 @@ router.post('/close-route', async (req, res) => {
     const { currentTime, currentDate } = getSriLankaTiming();
 
     let collectedCOD = 0;
-    let riderCommission = 0;
+    let totalRiderCommission = 0;
 
     for (let parcel of activeParcels) {
       if (upperRemaining.includes(parcel.trackingId.toUpperCase())) {
-        // Exception Match: Scanned item was NOT delivered (Returned to station bag)
         parcel.assignedRider = null;
         parcel.statusLabel = 'Returned to Hub';
         parcel.eta = 'Pending Re-assignment';
         parcel.events.unshift({ time: currentTime, date: currentDate, label: 'Delivery Failed', desc: 'Returned back to gateway inventory stacks.', done: true });
         await parcel.save();
       } else {
-        // Exception Absence: Item assumed successfully delivered!
         parcel.status = 'delivered';
         parcel.statusLabel = 'Delivered';
         parcel.eta = 'Completed';
         parcel.events.unshift({ time: currentTime, date: currentDate, label: 'Delivered', desc: 'Delivery verification check-out completed.', done: true });
         await parcel.save();
 
+        let itemCommission = Number(parcel.commission);
+        if (!itemCommission || itemCommission === 0) {
+          const searchCityKey = (parcel.recipient || '').trim().toLowerCase();
+          itemCommission = cityCommissions[searchCityKey] || 150;
+        }
+
         collectedCOD += (parcel.codPrice || 0);
-        riderCommission += (parcel.commission || 0);
+        totalRiderCommission += itemCommission;
       }
     }
 
-    // Mathematical Equation: Net due to company = Collected COD - Commission Cut
-    const sessionOutstandingDebt = Math.max(0, collectedCOD - riderCommission);
+    const sessionOutstandingDebt = Math.max(0, collectedCOD - totalRiderCommission);
 
-    // Roll balance over into permanent ledger memory file
     rider.pendingBalance += sessionOutstandingDebt;
     rider.status = 'Available';
     await rider.save();
 
     res.redirect('/dispatch');
   } catch (err) {
-    console.error(err);
+    console.error('Core audit loop fault:', err);
     res.redirect('/dispatch');
   }
 });
@@ -194,7 +280,7 @@ router.post('/clear-balance', async (req, res) => {
   try {
     const rider = await Rider.findById(riderId);
     if (rider) {
-      rider.pendingBalance = 0; // Balance liquidated completely
+      rider.pendingBalance = 0; 
       await rider.save();
     }
     res.redirect('/dispatch');
