@@ -1,6 +1,118 @@
+<!-- ── UNIFIED NAV STYLESHEET EXTENSIONS ── -->
+<style>
+  /* ── DESKTOP DROPDOWN VIEWPORT ARCHITECTURE ── */
+  .site-nav__dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .site-nav__dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+  }
+  
+  .site-nav__dropdown-toggle svg {
+    width: 10px;
+    height: 10px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    transition: transform var(--speed) var(--ease);
+  }
+  
+  /* Rotates chevron vector indicator on element container focus */
+  .site-nav__dropdown:hover .site-nav__dropdown-toggle svg {
+    transform: rotate(180deg);
+  }
+  
+  .site-nav__dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, rgba(15, 23, 42, 0.08));
+    border-radius: var(--radius, 6px);
+    min-width: 210px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease), visibility var(--speed);
+    z-index: 1100;
+  }
+  
+  .site-nav__dropdown:hover .site-nav__dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transform: translateX(-50%) translateY(4px);
+  }
+  
+  .site-nav__dropdown-menu a {
+    display: block !important;
+    padding: 0.65rem 1.25rem !important;
+    font-size: 0.92rem !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    color: var(--muted, #64748b) !important;
+    transition: background var(--speed), color var(--speed);
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-align: left;
+  }
+  
+  /* Disables line decorations inside menu block layers */
+  .site-nav__dropdown-menu a::after {
+    display: none !important;
+  }
+  
+  .site-nav__dropdown-menu a:hover,
+  .site-nav__dropdown-menu a.is-active {
+    background: var(--bg-raised, #f1f5f9) !important;
+    color: var(--orange, #D44F0A) !important;
+  }
+
+  /* ── 📱 MOBILE SUB-GROUP ACCORDION STYLES ── */
+  .site-nav__drawer-group {
+    margin: 0.25rem 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border, rgba(15, 23, 42, 0.08));
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  
+  .site-nav__drawer-group-title {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted, #64748b);
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    text-align: left;
+  }
+  
+  .site-nav__drawer-group a {
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+  }
+</style>
+
+<!-- ── PRE-COMPILE SYSTEM VARIABLE PATHS (EJS LOGIC) ── -->
+<% 
+  let isOperationsActive = (page === 'tracking' || page === 'dispatch' || page === 'add-parcel' || page === 'report');
+%>
+
 <header class="site-nav" id="siteNav">
   <div class="site-nav__inner">
 
+    <!-- BRAND LOGO KEY -->
     <a href="/" class="site-nav__logo">
       <div class="site-nav__logo-icon">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -14,36 +126,53 @@
       </div>
     </a>
 
+    <!-- WIDESCREEN DESKTOP LINKS -->
     <nav class="site-nav__links">
-      <a href="/"              class="<%= page==='home'       ? 'is-active':'' %>">Home</a>
-      <a href="/services"      class="<%= page==='services'   ? 'is-active':'' %>">Services</a>
-      <a href="/tracking"      class="<%= page==='tracking'   ? 'is-active':'' %>">Track Shipment</a>
+      <a href="/" class="<%= page==='home' ? 'is-active':'' %>">Home</a>
+      <a href="/services" class="<%= page==='services' ? 'is-active':'' %>">Services</a>
       
-      <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
-      <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
-      <a href="/dispatch/report" class="<%= page==='report'     ? 'is-active':'' %>">Ledger Reports</a>
+      <!-- 🌟 OPERATIONS DROPDOWN ENGINE MENU -->
+      <div class="site-nav__dropdown">
+        <a class="site-nav__dropdown-toggle <%= isOperationsActive ? 'is-active' : '' %>">
+          Operations
+          <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="site-nav__dropdown-menu">
+          <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
+          <a href="/dispatch" class="<%= page==='dispatch' ? 'is-active':'' %>">Dispatch Desk</a>
+          <a href="/dispatch/add" class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
+          <a href="/dispatch/report" class="<%= page==='report' ? 'is-active':'' %>">Ledger Reports</a>
+        </div>
+      </div>
       
-      <a href="/about"         class="<%= page==='about'      ? 'is-active':'' %>">About</a>
-      <a href="/contact"       class="site-nav__cta">Get a Quote</a>
+      <a href="/about" class="<%= page==='about' ? 'is-active':'' %>">About</a>
+      <a href="/contact" class="site-nav__cta">Get a Quote</a>
     </nav>
 
+    <!-- MOBILE BURGER TRIGGER BUTTON -->
     <button class="site-nav__burger" id="navBurger" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
   </div>
 
+  <!-- RESPONSIVE DRAWER OVERLAY -->
   <div class="site-nav__drawer" id="navDrawer">
     <button class="site-nav__drawer-close" id="navClose" aria-label="Close menu">✕</button>
-    <a href="/"              class="<%= page==='home'       ? 'is-active':'' %>">Home</a>
-    <a href="/services"      class="<%= page==='services'   ? 'is-active':'' %>">Services</a>
-    <a href="/tracking"      class="<%= page==='tracking'   ? 'is-active':'' %>">Track Shipment</a>
+    <a href="/" class="<%= page==='home' ? 'is-active':'' %>">Home</a>
+    <a href="/services" class="<%= page==='services' ? 'is-active':'' %>">Services</a>
     
-    <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
-    <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
-    <a href="/dispatch/report" class="<%= page==='report'     ? 'is-active':'' %>">Ledger Reports</a>
+    <!-- 🌟 ORGANIZED COMPACT MOBILE ACCORDION GROUP -->
+    <div class="site-nav__drawer-group">
+      <div class="site-nav__drawer-group-title">Terminal Operations</div>
+      <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
+      <a href="/dispatch" class="<%= page==='dispatch' ? 'is-active':'' %>">Dispatch Desk</a>
+      <a href="/dispatch/add" class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
+      <a href="/dispatch/report" class="<%= page==='report' ? 'is-active':'' %>">Ledger Reports</a>
+    </div>
     
-    <a href="/about"         class="<%= page==='about'      ? 'is-active':'' %>">About</a>
-    <a href="/contact"       style="margin-top: 1rem; text-align: center; display: block; background: var(--orange); color: white; padding: 0.8rem; border-radius: var(--radius); font-weight: bold; text-decoration: none;">Get a Quote</a>
+    <a href="/about" class="<%= page==='about' ? 'is-active':'' %>">About</a>
+    <a href="/contact" style="margin-top: 1rem; text-align: center; display: block; background: var(--orange); color: white; padding: 0.8rem; border-radius: var(--radius); font-weight: bold; text-decoration: none;">Get a Quote</a>
   </div>
+  
   <div class="site-nav__overlay" id="navOverlay"></div>
 </header>
