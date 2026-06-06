@@ -274,53 +274,76 @@
         </div>
       </div>
 
-      
+      <!-- Map Block -->
 <div class="map-box reveal" data-d="2">
   <div class="map-box__title">Island-Wide Coverage</div>
-  <div class="map-box__svg-wrap" style="height: 380px; position: relative; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
-    <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+  <div class="map-box__svg-wrap" style="height: 380px; position: relative; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden;">
+    
+    <!-- HIGH-PRECISION GEOGRAPHIC VECTOR MATRIX -->
+    <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; display: block;">
       <defs>
-        <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="1" fill="rgba(15, 23, 42, 0.06)"/>
+        <!-- Dynamic background telemetry coordinate grid network patterns -->
+        <pattern id="telemetryGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="1" fill="rgba(255, 255, 255, 0.03)"/>
         </pattern>
+        <!-- High-contrast overlay styling gradient elements -->
+        <linearGradient id="islandGradient" x1="150" y1="0" x2="150" y2="400" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="rgba(212, 79, 10, 0.02)"/>
+          <stop offset="100%" stop-color="rgba(212, 79, 10, 0.08)"/>
+        </linearGradient>
       </defs>
-      <rect width="300" height="400" fill="url(#dots)" />
-      
-      <path d="M152.5 22.5 C154.2 22.1, 157.1 23.9, 158.2 25.4 C160.5 28.1, 163.4 29.5, 166.1 31.2 C170.2 33.8, 167.4 37.1, 163.5 37.4 C158.2 37.8, 154.5 41.2, 152.8 45.8 C151.2 50.1, 153.8 54.2, 156.4 57.5 C160.1 62.1, 165.2 65.4, 169.1 70.2 C174.5 76.8, 178.2 84.1, 182.4 91.5 C185.8 97.4, 191.1 101.5, 194.5 107.4 C198.8 114.8, 203.4 122.1, 204.8 130.5 C206.1 138.2, 211.2 143.4, 212.5 151.2 C214.1 160.8, 218.4 169.5, 218.8 179.2 C219.1 188.1, 215.4 196.2, 214.2 205.1 C213.1 213.4, 215.8 221.5, 214.8 229.8 C213.8 238.1, 208.5 244.5, 205.8 252.1 C202.4 261.8, 201.2 272.1, 197.8 281.8 C194.8 290.4, 195.1 299.8, 189.5 307.5 C184.2 314.8, 181.4 323.5, 173.8 329.2 C167.1 334.2, 161.2 340.4, 152.5 343.8 C145.2 346.6, 137.4 348.1, 130.4 351.5 C122.1 355.5, 114.2 352.1, 106.8 346.5 C101.1 342.2, 97.5 335.8, 93.4 329.8 C89.1 323.5, 87.5 315.4, 85.8 307.8 C84.1 300.2, 81.4 293.1, 80.5 285.2 C79.5 277.2, 82.8 269.8, 82.2 261.8 C81.5 253.8, 77.2 247.1, 77.8 239.1 C78.5 231.1, 82.4 223.8, 82.1 215.8 C81.8 207.8, 77.5 201.2, 78.2 193.2 C78.8 185.2, 82.5 178.1, 81.5 170.1 C80.5 162.1, 75.2 155.5, 75.8 147.5 C76.5 139.5, 82.1 133.1, 83.4 125.2 C85.1 114.8, 89.2 105.1, 92.5 95.2 C95.8 85.4, 95.1 75.1, 100.2 66.2 C104.5 58.8, 111.2 53.1, 116.8 46.2 C122.4 39.4, 126.1 31.4, 132.8 25.5 C138.2 20.8, 147.2 23.8, 152.5 22.5 Z" 
-            stroke="rgba(212, 79, 10, 0.25)" stroke-width="1.8" fill="rgba(212, 79, 10, 0.04)" stroke-linejoin="round"/>
 
-      <line x1="86" y1="268" x2="144" y2="220" stroke="rgba(212, 79, 10, 0.3)" stroke-width="1.2" stroke-dasharray="4 3" />
-      <line x1="86" y1="268" x2="94" y2="352" stroke="rgba(212, 79, 10, 0.2)" stroke-width="1.2" stroke-dasharray="4 3" />
-      <line x1="86" y1="268" x2="156" y2="46" stroke="rgba(212, 79, 10, 0.25)" stroke-width="1.2" stroke-dasharray="4 3" />
-      <line x1="86" y1="268" x2="81" y2="240" stroke="rgba(212, 79, 10, 0.2)" stroke-width="1.2" stroke-dasharray="4 3" />
-      <line x1="86" y1="268" x2="214" y2="202" stroke="rgba(212, 79, 10, 0.2)" stroke-width="1.2" stroke-dasharray="4 3" />
+      <!-- Background structural matrix layers -->
+      <rect width="300" height="400" fill="transparent"/>
+      <rect width="300" height="400" fill="url(#telemetryGrid)"/>
+
+      <!-- GEOGRAPHIC BOUNDARY VECTOR: REAL SRI LANKA SHORELINE PROFILE -->
+      <path d="M152,28 C156,26 166,24 172,32 C176,37 167,42 163,44 C158,47 151,46 148,49 C145,52 144,56 141,58 C135,63 128,57 122,60 C117,62 103,72 98,75 C94,77 82,85 86,90 C90,95 101,91 106,88 C114,84 122,86 130,81 C135,78 141,71 147,73 C151,75 149,85 152,89 C157,96 168,103 174,109 C183,117 194,124 199,135 C204,146 201,159 207,170 C212,180 223,188 226,199 C229,209 224,221 228,231 C231,239 237,246 238,255 C239,266 229,274 227,284 C224,296 226,309 217,318 C209,326 195,327 187,335 C180,342 176,353 166,357 C157,361 146,358 137,359 C128,360 119,355 112,350 C106,346 102,337 98,331 C93,323 93,313 90,304 C87,294 80,287 80,276 C80,264 87,256 86,244 C85,231 79,222 81,209 C83,197 89,188 89,176 C89,165 83,157 85,146 C87,136 94,131 93,120 C92,111 82,107 83,98 C84,91 93,89 97,83 C101,77 101,67 107,62 C114,56 122,54 129,48 C135,43 140,33 147,30 Z" 
+            fill="url(#islandGradient)" 
+            stroke="rgba(212, 79, 10, 0.45)" 
+            stroke-width="1.75" 
+            stroke-linejoin="round"
+      />
+
+      <!-- LOGISTICS TRANSFER HUB ROUTE TRACE STRINGS -->
+      <line x1="97" y1="243" x2="135" y2="204" stroke="rgba(212, 79, 10, 0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="135" y1="204" x2="160" y2="34" stroke="rgba(212, 79, 10, 0.25)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="97" y1="243" x2="114" y2="348" stroke="rgba(212, 79, 10, 0.25)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="135" y1="204" x2="223" y2="198" stroke="rgba(212, 79, 10, 0.3)" stroke-width="1" stroke-dasharray="4 3"/>
     </svg>
     
-    <div class="map-city" style="top: 67%; left: 28.5%;">
-      <div class="map-city-dot lg"></div>
-      <div class="map-city-label">Colombo</div>
-    </div>
-    <div class="map-city" style="top: 55%; left: 48%;">
-      <div class="map-city-dot lg"></div>
-      <div class="map-city-label">Kandy</div>
-    </div>
-    <div class="map-city" style="top: 88%; left: 31.5%;">
-      <div class="map-city-dot"></div>
-      <div class="map-city-label">Galle</div>
-    </div>
-    <div class="map-city" style="top: 11.5%; left: 52%;">
+    <!-- GEOGRAPHICALLY LOCKED INTERFACE LABELS (COMPATIBLE WITH NEW COASTLINE) -->
+    <div class="map-city" style="top: 8%; left: 52%;">
       <div class="map-city-dot"></div>
       <div class="map-city-label">Jaffna</div>
     </div>
-    <div class="map-city" style="top: 60%; left: 27%;">
-      <div class="map-city-dot"></div>
-      <div class="map-city-label">Negombo</div>
-    </div>
-    <div class="map-city" style="top: 50.5%; left: 71.5%;">
+
+    <div class="map-city" style="top: 49%; left: 76%;">
       <div class="map-city-dot"></div>
       <div class="map-city-label">Batticaloa</div>
     </div>
+
+    <div class="map-city" style="top: 50%; left: 44%;">
+      <div class="map-city-dot lg"></div>
+      <div class="map-city-label">Kandy</div>
+    </div>
+
+    <div class="map-city" style="top: 55%; left: 24%;">
+      <div class="map-city-dot"></div>
+      <div class="map-city-label">Negombo</div>
+    </div>
+
+    <div class="map-city" style="top: 61%; left: 28%;">
+      <div class="map-city-dot lg"></div>
+      <div class="map-city-label">Colombo</div>
+    </div>
+
+    <div class="map-city" style="top: 87%; left: 36%;">
+      <div class="map-city-dot"></div>
+      <div class="map-city-label">Galle</div>
+    </div>
   </div>
+
   <div class="map-tags" style="margin-top: 1rem;">
     <span class="map-tag">25 Districts</span>
     <span class="map-tag">3 Main Hubs</span>
