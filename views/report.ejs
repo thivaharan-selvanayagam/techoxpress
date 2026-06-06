@@ -1,108 +1,160 @@
 <%- include('partials/head') %>
 <%- include('partials/nav') %>
 
+<!-- ── LOCALIZED RESPONSIVE GRID ENGINE OVERRIDES ── -->
+<style>
+  .report-filter-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: end;
+  }
+  
+  .report-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .table-capsule {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Responsive breakpoints wrap inputs and metrics cards on small viewports */
+  @media (max-width: 960px) {
+    .report-filter-grid, .report-stats-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1.25rem !important;
+    }
+    .page-hero {
+      padding-top: 6.5rem !important;
+      padding-bottom: 2rem !important;
+    }
+    .contact-page {
+      padding-top: 1rem !important;
+    }
+    .contact-form-box {
+      padding: 1.5rem 1rem !important;
+    }
+    .stat-card-value {
+      font-size: 1.85rem !important;
+    }
+  }
+</style>
+
 <section class="page-hero">
   <div class="page-hero__bg"></div>
   <div class="page-hero__accent"></div>
   <div class="container">
     <div class="page-hero__label">Logistics Data Analytics</div>
-    <h1 class="page-hero__title">PERFORMANCE<br><em>LEDGER REPORTS.</em></h1>
+    <h1 class="page-hero__title" style="color: #0F172A;">PERFORMANCE<br><em>LEDGER REPORTS.</em></h1>
   </div>
 </section>
 
-<section class="contact-page" style="padding-top: 2rem;">
+<section class="contact-page" style="padding-top: 2rem; background: var(--bg);">
   <div class="container" style="max-width: 1200px;">
     
-    <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 3rem;">
-      <div class="form-sub" style="color: var(--orange);">Audit Filter Parameters</div>
-      <h2 class="form-heading" style="font-size: 1.6rem; margin-bottom: 1.5rem;">Generate Settlement Audit</h2>
+    <!-- FILTER CONTROL PARAMETERS CARD -->
+    <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
+      <div class="mono-label" style="color: var(--orange); margin-bottom: 0.5rem;">Audit Filter Parameters</div>
+      <h2 class="form-heading" style="font-size: 1.6rem; margin-bottom: 1.5rem; color: #0F172A;">Generate Settlement Audit</h2>
 
       <form method="POST" action="/dispatch/report">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem; align-items: end;">
+        <div class="report-filter-grid">
           
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">Select Target Rider unit *</label>
-            <select name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
-              <option value="">-- CHOOSE COURIER UNIT FOR AUDIT --</option>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Select Target Rider Unit *</label>
+            <select name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none; -webkit-appearance: select;">
+              <option value="" style="color: var(--muted);">-- CHOOSE COURIER UNIT FOR AUDIT --</option>
               <% riders.forEach(r => { %>
-                <option value="<%= r._id %>"><%= r.name %> [<%= r.vehicle %>]</option>
+                <option value="<%= r._id %>" style="color: var(--text);"><%= r.name %> [<%= r.vehicle %>]</option>
               <% }) %>
             </select>
           </div>
 
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">Start Date *</label>
-            <input type="date" name="startDate" required style="width: 100%; padding: 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Start Date *</label>
+            <input type="date" name="startDate" required style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
           </div>
 
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">End Date *</label>
-            <input type="date" name="endDate" required style="width: 100%; padding: 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: var(--font-mono); outline: none;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">End Date *</label>
+            <input type="date" name="endDate" required style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
           </div>
 
         </div>
 
-        <button type="submit" class="track-btn" style="width: 100%; margin-top: 2rem; justify-content: center; background: var(--orange); color: white; border: none; font-weight: bold; padding: 1.1rem; font-size: 1rem; border-radius: var(--radius); cursor: pointer;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; justify-content: center; padding: 1.1rem; border: none; border-radius: var(--radius); cursor: pointer; box-shadow: 0 4px 14px var(--orange-glow);">
           Compile Performance & Financial Statement
         </button>
       </form>
     </div>
 
+    <!-- DYNAMIC COMPILED REPORT SECTION -->
     <% if (reportData) { %>
       <div style="margin-bottom: 4rem;">
         
+        <!-- Audit Window Metadata Label -->
         <div style="margin-bottom: 2rem; border-left: 4px solid var(--orange); padding-left: 1rem;">
-          <h2 style="color: white; margin: 0; font-size: 2rem;"><%= reportData.riderName %></h2>
-          <p style="color: var(--muted); font-family: var(--font-mono); font-size: 0.9rem; margin-top: 0.2rem;">
-            📅 Timeline Window: <span style="color: var(--white); font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: var(--white); font-weight: bold;"><%= reportData.endStr %></span> (Asia/Colombo)
+          <h2 style="color: #0F172A; margin: 0; font-size: 2rem; font-family: var(--font-head); font-weight: 800;"><%= reportData.riderName %></h2>
+          <p style="color: var(--muted); font-family: var(--font-mono); font-size: 0.88rem; margin-top: 0.2rem; font-weight: 600;">
+            📅 Timeline Window: <span style="color: #0F172A; font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: #0F172A; font-weight: bold;"><%= reportData.endStr %></span> (Asia/Colombo)
           </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem;">
+        <!-- Metric Scoreboard Grid Counters -->
+        <div class="report-stats-grid">
           
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center;">
-            <div style="color: #2ecc71; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">1. Total Commission Earned</div>
-            <div style="font-size: 2.2rem; font-weight: 800; color: #2ecc71; font-family: var(--font-mono);">LKR <%= reportData.totalCommission.toLocaleString() %></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid #10b981;">
+            <div style="color: #10b981; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">1. Total Commission Earned</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #10b981; font-family: var(--font-mono);">LKR <%= reportData.totalCommission.toLocaleString() %></div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center;">
-            <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">2. Total Parcels Delivered</div>
-            <div style="font-size: 2.2rem; font-weight: 800; color: var(--orange); font-family: var(--font-mono);"><%= reportData.totalDelivered %> <span style="font-size: 1.2rem; color: var(--muted);">Units</span></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid var(--orange);">
+            <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">2. Total Parcels Delivered</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: var(--orange); font-family: var(--font-mono);"><%= reportData.totalDelivered %> <span style="font-size: 1.1rem; color: var(--muted); font-weight: 500;">Units</span></div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center;">
-            <div style="color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">3. Total COD Cash Collected</div>
-            <div style="font-size: 2.2rem; font-weight: 800; color: var(--white); font-family: var(--font-mono);">LKR <%= reportData.totalCOD.toLocaleString() %></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid #0F172A;">
+            <div style="color: #0F172A; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">3. Total COD Cash Collected</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #0F172A; font-family: var(--font-mono);">LKR <%= reportData.totalCOD.toLocaleString() %></div>
           </div>
 
         </div>
 
-        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius);">
-          <h3 style="color: white; font-family: var(--font-mono); text-transform: uppercase; font-size: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Historical Audit Log Breakdown</h3>
+        <!-- ITEMIZED HISTORICAL LEDGER BREAKDOWN SHEET -->
+        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
+          <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; letter-spacing: 0.02em;">Historical Audit Log Breakdown</h3>
           
           <% if (reportData.parcels.length === 0) { %>
-            <p style="color: var(--muted); font-style: italic; text-align: center; padding: 2rem 0;">No successful delivery records tracked for this unit within selected parameters.</p>
+            <p style="color: var(--muted); font-style: italic; text-align: center; padding: 2rem 0; font-weight: 500;">No successful delivery records tracked for this unit within selected parameters.</p>
           <% } else { %>
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.85rem; color: var(--white);">
-              <thead>
-                <tr style="border-bottom: 2px solid var(--border); color: var(--muted); text-transform: uppercase; font-size: 0.75rem;">
-                  <th style="padding: 0.8rem;">Tracking ID</th>
-                  <th style="padding: 0.8rem;">Destination Target</th>
-                  <th style="padding: 0.8rem;">COD Value</th>
-                  <th style="padding: 0.8rem; text-align: right;">Commission Paid</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% reportData.parcels.forEach(p => { %>
-                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 0.8rem; font-weight: bold; color: var(--orange);">📦 <%= p.trackingId %></td>
-                    <td style="padding: 0.8rem;"><%= p.recipient %></td>
-                    <td style="padding: 0.8rem; color: var(--muted);">LKR <%= (p.codPrice || 0).toLocaleString() %></td>
-                    <td style="padding: 0.8rem; text-align: right; color: #2ecc71; font-weight: bold;">LKR <%= (p.commission || 150).toLocaleString() %></td>
+            <!-- Responsive container intercepts and enables clean touch scrolling on narrow screen profiles -->
+            <div class="table-capsule">
+              <table style="width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.88rem; color: var(--text);">
+                <thead>
+                  <tr style="border-bottom: 2px solid var(--border); color: var(--muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700;">
+                    <th style="padding: 0.8rem 0.5rem;">Tracking ID</th>
+                    <th style="padding: 0.8rem 0.5rem;">Destination Target</th>
+                    <th style="padding: 0.8rem 0.5rem;">COD Value</th>
+                    <th style="padding: 0.8rem 0.5rem; text-align: right;">Commission Paid</th>
                   </tr>
-                <% }) %>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <% reportData.parcels.forEach(p => { %>
+                    <tr style="border-bottom: 1px solid var(--border); font-weight: 600;">
+                      <td style="padding: 0.9rem 0.5rem; font-weight: 700; color: var(--orange);">📦 <%= p.trackingId %></td>
+                      <td style="padding: 0.9rem 0.5rem; color: var(--text);"><%= p.recipient %></td>
+                      <td style="padding: 0.9rem 0.5rem; color: var(--muted);">LKR <%= (p.codPrice || 0).toLocaleString() %></td>
+                      <td style="padding: 0.9rem 0.5rem; text-align: right; color: #10b981; font-weight: 700;">LKR <%= (p.commission || 150).toLocaleString() %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
           <% } %>
         </div>
 
