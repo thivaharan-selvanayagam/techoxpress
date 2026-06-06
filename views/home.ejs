@@ -5,6 +5,7 @@
 <section class="hero">
   <div class="hero__grid"></div>
 
+  <!-- Soft diagonal panel styling adjusted for light theme compatibility -->
   <div class="hero__panel">
     <div class="hero__panel-stripe"></div>
     <div class="hero__panel-border"></div>
@@ -63,7 +64,7 @@
     </div>
   </div>
 
-  <!-- Ticker -->
+  <!-- Ticker (Maintains clear white text contrast against solid orange backdrop) -->
   <div class="hero__ticker" aria-hidden="true">
     <div class="hero__ticker-track">
       <span>Same-Day Express Delivery</span>
@@ -73,7 +74,7 @@
       <span>Island-Wide Coverage</span>
       <span>Bulk Shipping</span>
       <span>Tech-Powered Logistics</span>
-      <!-- duplicate for seamless loop -->
+      <!-- Duplicate strings for seamless endless loop cycle animation -->
       <span>Same-Day Express Delivery</span>
       <span>Real-Time Package Tracking</span>
       <span>Corporate Logistics Solutions</span>
@@ -93,7 +94,8 @@
       <div class="trackbar__icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
       </div>
-      <input class="trackbar__input" type="text" name="trackingId" placeholder="Enter tracking ID — e.g. TXT-2025-001" autocomplete="off" />
+      <!-- 🌟 FIXED: Shifted reference window context to 2026 -->
+      <input class="trackbar__input" type="text" name="trackingId" placeholder="Enter tracking ID — e.g. TXT-2026-001" autocomplete="off" />
       <button type="submit" class="trackbar__btn">
         Track
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
@@ -221,30 +223,31 @@
         </div>
       </div>
 
-      <!-- Map -->
+      <!-- Map Block -->
       <div class="map-box reveal" data-d="2">
         <div class="map-box__title">Island-Wide Coverage</div>
         <div class="map-box__svg-wrap" style="height: 320px;">
           <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-            <!-- Dot grid -->
             <defs>
+              <!-- 🌟 FIXED: Swapped out faint white dots for high-visibility light grey system points -->
               <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                <circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.08)"/>
+                <circle cx="1" cy="1" r="1" fill="rgba(15, 23, 42, 0.05)"/>
               </pattern>
             </defs>
             <rect width="300" height="400" fill="var(--bg-card)"/>
             <rect width="300" height="400" fill="url(#dots)"/>
-            <!-- island outline (simplified Sri Lanka) -->
+            <!-- Island profile layout bounds -->
             <path d="M110 28 Q150 18 190 38 Q228 64 236 112 Q250 168 244 228 Q238 288 210 344 Q188 382 150 396 Q112 382 90 344 Q62 288 56 228 Q50 168 64 112 Q72 64 110 28Z"
-              stroke="rgba(212,79,10,0.2)" stroke-width="1.5" fill="rgba(212,79,10,0.04)"/>
-            <!-- route lines -->
-            <line x1="88" y1="218" x2="142" y2="142" stroke="rgba(212,79,10,0.3)" stroke-width="1" stroke-dasharray="5 3"/>
-            <line x1="142" y1="142" x2="178" y2="44" stroke="rgba(212,79,10,0.25)" stroke-width="1" stroke-dasharray="5 3"/>
-            <line x1="88"  y1="218" x2="74"  y2="184" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
-            <line x1="88"  y1="218" x2="110" y2="330" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
-            <line x1="142" y1="142" x2="208" y2="192" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
+              stroke="rgba(212,79,10,0.2)" stroke-width="1.5" fill="rgba(212,79,10,0.03)"/>
+            <!-- Route path indicator strings -->
+            <line x1="88" y1="218" x2="142" y2="142" stroke="rgba(212,79,10,0.25)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="142" y1="142" x2="178" y2="44" stroke="rgba(212,79,10,0.2)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="88"  y1="218" x2="74"  y2="184" stroke="rgba(212,79,10,0.15)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="88"  y1="218" x2="110" y2="330" stroke="rgba(212,79,10,0.15)" stroke-width="1" stroke-dasharray="5 3"/>
+            <line x1="142" y1="142" x2="208" y2="192" stroke="rgba(212,79,10,0.15)" stroke-width="1" stroke-dasharray="5 3"/>
           </svg>
-          <!-- City dots positioned via CSS absolute inside relative wrapper -->
+          
+          <!-- City pins rendered accurately via relative structural coordinates -->
           <div class="map-city" style="top:56%; left:30%;">
             <div class="map-city-dot lg"></div>
             <div class="map-city-label">Colombo</div>
@@ -294,7 +297,7 @@
           Get a Quote
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
         </a>
-        <a href="/tracking" class="btn" style="background:rgba(0,0,0,0.2); color:#fff; border:2px solid rgba(255,255,255,0.35);">
+        <a href="/tracking" class="btn" style="background: rgba(0, 0, 0, 0.15); color: #fff; border: 2px solid rgba(255, 255, 255, 0.4);">
           Track Package
         </a>
       </div>
