@@ -1,6 +1,32 @@
 <%- include('partials/head') %>
 <%- include('partials/nav') %>
 
+<style>
+  .dispatch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  
+  @media (max-width: 960px) {
+    .dispatch-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .page-hero {
+      padding-top: 6.5rem !important;
+      padding-bottom: 2rem !important;
+    }
+    .contact-page {
+      padding-top: 1rem !important;
+    }
+    .contact-form-box {
+      padding: 1.25rem 1rem !important;
+    }
+  }
+</style>
+
 <section class="page-hero">
   <div class="page-hero__bg"></div>
   <div class="page-hero__accent"></div>
@@ -13,11 +39,11 @@
 <section class="contact-page" style="padding-top: 2rem; background: var(--bg);">
   <div class="container" style="max-width: 1400px;">
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;">
+    <div class="dispatch-grid">
       
-      <!-- LEFT ACTION MATRIX COLUMN -->
+      <!-- LEFT COLUMN: MANIFEST PACKING & LEDGER REGISTRY -->
       <div>
-        <!-- Outbound Manifest Panel Container Block -->
+        <!-- Outbound Manifest Panel -->
         <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
           <div class="mono-label" style="color: var(--orange); margin-bottom: 0.5rem;">Shift Phase I</div>
           <h2 class="form-heading" style="font-size: 1.8rem; margin-bottom: 1.5rem; color: #0F172A;">Outbound Hub Manifest</h2>
@@ -26,7 +52,6 @@
             
             <div class="form-group" style="margin-bottom: 1.5rem;">
               <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Courier Target Unit</label>
-              <!-- 🌟 FIXED: Swapped out background and white typography styles for light theme system controls -->
               <select id="riderSelect" name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; -webkit-appearance: select;">
                 <option value="" style="color: var(--muted);">-- CHOOSE AVAILABLE RIDER POOL --</option>
                 <% riders.forEach(rider => { %>
@@ -39,13 +64,12 @@
 
             <div class="form-group" style="margin-top: 2rem;">
               <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 600;">Barcode Interceptor</label>
-              <!-- 🌟 FIXED: Updated input context parameters with solid dark type fills -->
               <input type="text" id="barcodeScannerInput" placeholder="Click here and scan outgoing parcel stickers..." style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border-o); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; text-transform: uppercase;" autocomplete="off">
             </div>
 
-            <div style="margin: 2rem 0; background: var(--bg-raised); padding: 1rem; border-radius: var(--radius); border: 1px solid var(--border);">
+            <div style="margin: 2rem 0; background: var(--bg-raised); padding: 1rem; border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto;">
               <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; font-weight: 600;">Outbound Load Queue (<span id="scanCount" style="color:var(--orange); font-weight:bold;">0</span> Staged)</div>
-              <table style="width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text);">
+              <table style="width: 100%; min-width: 280px; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text);">
                 <tbody id="manifestQueueBody">
                   <tr id="emptyRowState"><td style="padding: 1.5rem; text-align: center; color: var(--muted); font-style: italic;">Staging grid clear. Run scanner beams to pack rows.</td></tr>
                 </tbody>
@@ -56,24 +80,23 @@
           </form>
         </div>
 
-        <!-- Ledger Log Card Component Block -->
-        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
+        <!-- Ledger Registry Card -->
+        <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
           <h3 style="font-size: 1.1rem; color: #0F172A; font-family: var(--font-head); font-weight: 800; text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; letter-spacing: 0.02em;">🚨 Outstanding Ledger Registry</h3>
           <div style="max-height: 250px; overflow-y: auto;">
             <% allRiders.forEach(r => { %>
-              <!-- 🌟 FIXED: Swapped dark transparency boundary line splits for unified var(--border) variables -->
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;">
-                <span style="color: var(--text);"><%= r.name %></span>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; gap: 0.5rem;">
+                <span style="color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= r.name %></span>
                 <% if (r.pendingBalance > 0) { %>
-                  <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span style="color: #d9534f; font-weight: bold;">LKR <%= r.pendingBalance.toLocaleString() %></span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                    <span style="color: #d9534f; font-weight: bold; white-space: nowrap;">LKR <%= r.pendingBalance.toLocaleString() %></span>
                     <form method="POST" action="/dispatch/clear-balance">
                       <input type="hidden" name="riderId" value="<%= r._id %>">
-                      <button type="submit" style="background: #10b981; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">Cash Received</button>
+                      <button type="submit" style="background: #10b981; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap;">Cash Received</button>
                     </form>
                   </div>
                 <% } else { %>
-                  <span style="color: #10b981; font-weight: 700;">✓ Balanced (0)</span>
+                  <span style="color: #10b981; font-weight: 700; flex-shrink: 0;">✓ Balanced</span>
                 <% } %>
               </div>
             <% }) %>
@@ -81,49 +104,46 @@
         </div>
       </div>
 
-      <!-- RIGHT TRACKING ENGINE MONITOR COLUMN -->
+      <!-- RIGHT COLUMN: ACTIVE FLEET MONITOR -->
       <div>
         <div class="mono-label" style="color: #10b981; margin-bottom: 0.5rem;">Shift Phase II</div>
         <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; font-family: var(--font-head);">Active Transit Monitor</h2>
 
         <% if (dynamicFleet.length === 0) { %>
-          <!-- 🌟 FIXED: Wiped layout-clashing asset values to create clean background states -->
           <div style="padding: 4rem 2rem; background: var(--bg-card); border: 2px dashed var(--border); border-radius: var(--radius); text-align: center; color: var(--muted); font-style: italic; font-weight: 500;">
             All units returned. No courier drivers currently in-transit vectors.
           </div>
         <% } %>
 
         <% dynamicFleet.forEach(({ rider, activePackages }) => { %>
-          <!-- 🌟 FIXED: Replaced unstyled #111 card configurations with pure white var(--bg-card) modules -->
+          <!-- 🌟 FIXED: Added "close-route-form" layout identifier tag -->
           <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.015); border-left: 4px solid #D44F0A;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; gap: 0.5rem;">
               <div>
                 <h3 style="color: #0F172A; font-size: 1.3rem; margin: 0; font-family: var(--font-head); font-weight: 800;"><%= rider.name %></h3>
-                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); font-weight: 600;">🚚 Vehicle Element: [<%= rider.vehicle %>]</span>
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); font-weight: 600;">🚚 Vehicle: [<%= rider.vehicle %>]</span>
               </div>
-              <span style="background: rgba(212, 79, 10, 0.06); color: var(--orange); border: 1px solid var(--border-o); font-family: var(--font-mono); font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">In Transit</span>
+              <span style="background: rgba(212, 79, 10, 0.06); color: var(--orange); border: 1px solid var(--border-o); font-family: var(--font-mono); font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; text-transform: uppercase; white-space: nowrap;">In Transit</span>
             </div>
 
             <div style="margin-bottom: 1.5rem; max-height: 140px; overflow-y: auto; background: var(--bg-raised); padding: 0.8rem; border-radius: var(--radius); font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border);">
               <div style="color: var(--muted); font-size: 0.72rem; margin-bottom: 0.4rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.02em;">Assigned Cargo Bag Documents:</div>
               <% activePackages.forEach(p => { %>
-                <div style="display: flex; justify-content: space-between; color: var(--text); padding: 0.25rem 0; font-weight: 600; border-bottom: 1px dashed rgba(15,23,42,0.04);">
+                <div style="display: flex; justify-content: space-between; color: var(--text); padding: 0.25rem 0; font-weight: 600; border-bottom: 1px dashed rgba(15,23,42,0.04); gap: 0.5rem;">
                   <span>📦 <%= p.trackingId %></span>
-                  <span style="color: var(--muted); font-weight: 500;"><%= p.recipient %> (LKR <%= p.codPrice %>)</span>
+                  <span style="color: var(--muted); font-weight: 500; font-size: 0.8rem; text-align: right;"><%= p.recipient %> (LKR <%= p.codPrice %>)</span>
                 </div>
               <% }) %>
             </div>
 
-            <form method="POST" action="/dispatch/close-route" id="closeForm_<%= rider._id %>">
+            <form method="POST" action="/dispatch/close-route" class="close-route-form" id="closeForm_<%= rider._id %>">
               <input type="hidden" name="riderId" value="<%= rider._id %>">
               
               <div class="form-group" style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 0.4rem; color: #10b981; font-size: 0.78rem; font-family: var(--font-mono); text-transform: uppercase; font-weight: 700; letter-spacing: 0.02em;">Scan Retained / Un-delivered Items:</label>
-                <!-- 🌟 FIXED: Softened alert inputs to clean functional matching colors -->
                 <input type="text" class="return-entry-field" data-rider="<%= rider._id %>" placeholder="Scan exception barcodes here..." style="width: 100%; padding: 0.8rem; background: var(--bg-raised); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; font-size: 0.9rem;" autocomplete="off">
               </div>
 
-              <!-- 🌟 FIXED: Wiped layout-breaking pure black layers for modern alpha properties -->
               <div style="margin-bottom: 1.5rem; background: var(--bg-raised); border-radius: var(--radius); padding: 0.75rem; border: 1px dashed var(--border);">
                 <div style="font-size: 0.72rem; font-family: var(--font-mono); color: #10b981; text-transform: uppercase; margin-bottom: 0.4rem; font-weight: 700; letter-spacing: 0.02em;">Scanned Bag Return Vectors:</div>
                 <div id="returnStaging_<%= rider._id %>" style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text); min-height: 25px; align-items: center; font-weight: 600;">
@@ -131,7 +151,8 @@
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: #e11d48; padding: 0.9rem; border-radius: var(--radius); border: none; font-size: 0.9rem; letter-spacing: 0.02em;">Close Dispatch & Run Financial Audit</button>
+              <!-- 🌟 FIXED: Shifted from type="submit" to type="button" and assigned the "audit-submit-btn" controller class -->
+              <button type="button" class="btn btn-primary audit-submit-btn" style="width: 100%; justify-content: center; background: #e11d48; padding: 0.9rem; border-radius: var(--radius); border: none; font-size: 0.9rem; letter-spacing: 0.02em;">Close Dispatch & Run Financial Audit</button>
             </form>
           </div>
         <% }) %>
@@ -185,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   returnFields.forEach(field => {
     field.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
-        e.preventDefault();
+        e.preventDefault(); // Intercept scanner carriage execution paths cleanly
         const trackingId = this.value.trim().toUpperCase();
         const riderId = this.getAttribute('data-rider');
         this.value = '';
@@ -204,9 +225,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const badge = document.createElement('span');
-        badge.style.cssText = "background: #ffe4e6; border: 1px solid #f43f5e; padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.3rem; color: #b91c1c; font-weight: 700;";
+        badge.style.cssText = "background: #ffe4e6; border: 1px solid #f43f5e; padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.3rem; color: #b91c1c; font-weight: 700; margin-bottom: 0.25rem;";
         badge.innerHTML = `⚠️ ${trackingId} <input type="hidden" name="remainingIds" value="${trackingId}">`;
         container.appendChild(badge);
+      }
+    });
+  });
+
+  // ── 🌟 THE MOUSE-ONLY SUBMISSION STRATEGY IMPLEMENTATION ──
+  // Block any automated native form submit triggers generated by input nodes
+  const closeRouteForms = document.querySelectorAll('.close-route-form');
+  closeRouteForms.forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+  });
+
+  // Route submittals solely via programmatic explicit mouse clicks
+  const auditBtns = document.querySelectorAll('.audit-submit-btn');
+  auditBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetForm = this.closest('form');
+      if (targetForm) {
+        targetForm.submit(); // Bypasses browser default submit interceptors smoothly
       }
     });
   });
