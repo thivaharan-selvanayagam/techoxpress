@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const session = require('express-session'); // 🌟 MOVE 1: Brought imports cleanly to the top
 require('dotenv').config(); // Load environment configurations
 
 const app = express();
@@ -32,8 +33,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// ── 🔒 MOVE 2: SESSION MANAGEMENT CONFIGURATION (Must execute before routes) ──
+app.use(session({
+  secret: 'techo_xpress_secure_matrix_key_2026', 
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Session expires automatically after 24 hours
+}));
+
+// Global variables middleware: Passes login status automatically to ALL your EJS files
+app.use((req, res, next) => {
+  res.locals.isLoggedIn = req.session.isLoggedIn || false;
+  next();
+});
+
 // ── SYSTEM ROUTING CHANNELS ──
 app.use('/',         require('./routes/home'));
+app.use('/',         require('./routes/auth'));     // 👈 🌟 LINKED YOUR AUTHENTICATION ROUTER HERE!
 app.use('/services', require('./routes/services'));
 app.use('/tracking', require('./routes/tracking'));
 app.use('/about',    require('./routes/about'));
@@ -51,20 +67,5 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Techo Xpress Engine running on http://localhost:${PORT}`));
 }
 
+// ── 🔒 CRITICAL EXPORT LINE (Must sit at the absolute bottom of the pipeline) ──
 module.exports = app;
-
-const session = require('express-session');
-
-// Place this right after your middleware setups (like app.use(express.urlencoded...))
-app.use(session({
-  secret: 'techo_xpress_secure_matrix_key_2026', // Change this to any secret string
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Session expires automatically after 24 hours
-}));
-
-// Global variables middleware: Passes login status automatically to ALL your EJS files
-app.use((req, res, next) => {
-  res.locals.isLoggedIn = req.session.isLoggedIn || false;
-  next();
-});
