@@ -99,8 +99,8 @@
               <% if (order.assignedRider) { %>
                 <span style="color: var(--white); font-weight: 700;"><%= order.assignedRider.name %></span>
                 <div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; font-family: var(--font-mono); letter-spacing: 0.02em;">
-                  Rider Name: <%= order.assignedRider.name %> &nbsp;
-                  📞 Contact: <%= order.assignedRider.phone %> &nbsp;·&nbsp; Transit Element: [<%= order.assignedRider.vehicle %>]
+                  Rider Name: <%= order.assignedRider.name %> &nbsp;<br>
+                  📞 Contact: <%= order.assignedRider.phone %> &nbsp;
                 </div>
               <% } else { %>
                 <span style="color: var(--orange); font-style: italic; font-weight: 500;">📡 Broadcasting to available freelance couriers...</span>
