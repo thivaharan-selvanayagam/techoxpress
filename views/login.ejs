@@ -1,0 +1,46 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero">
+  <div class="page-hero__bg"></div>
+  <div class="page-hero__accent"></div>
+  <div class="container">
+    <div class="page-hero__label">Secure Area Authority Boundary</div>
+    <h1 class="page-hero__title">STAFF <em>GATEWAY</em></h1>
+  </div>
+</section>
+
+<section class="contact-page" style="padding-top: 4rem; padding-bottom: 6rem;">
+  <div class="container" style="max-width: 500px;">
+    
+    <div class="contact-form-box">
+      <div class="form-sub">System Core Handshake</div>
+      <h2 class="form-heading">Personnel Sign-In</h2>
+
+      <% if (error) { %>
+      <div class="form-alert form-alert--error" style="margin-bottom: 2rem; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
+        <%= error %>
+      </div>
+      <% } %>
+
+      <form method="POST" action="/login">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Staff Username ID</label>
+          <input type="text" name="username" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 2.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Security Key / Password</label>
+          <input type="password" name="password" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); outline: none;">
+        </div>
+
+        <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1.1rem; background: var(--orange); color: var(--white); font-weight: bold; border: none; border-radius: var(--radius); cursor: pointer;">
+          Decrypt Security Access Nodes
+        </button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<%- include('partials/footer') %>

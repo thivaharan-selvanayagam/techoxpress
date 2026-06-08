@@ -52,3 +52,19 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = app;
+
+const session = require('express-session');
+
+// Place this right after your middleware setups (like app.use(express.urlencoded...))
+app.use(session({
+  secret: 'techo_xpress_secure_matrix_key_2026', // Change this to any secret string
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Session expires automatically after 24 hours
+}));
+
+// Global variables middleware: Passes login status automatically to ALL your EJS files
+app.use((req, res, next) => {
+  res.locals.isLoggedIn = req.session.isLoggedIn || false;
+  next();
+});

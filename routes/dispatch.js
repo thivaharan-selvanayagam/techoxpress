@@ -3,6 +3,17 @@ const router = express.Router();
 const Rider = require('../models/Rider');
 const Parcel = require('../models/Parcel');
 
+// ── 🔒 SECURITY GUARD MIDDLEWARE INTERCEPTOR ──
+const checkAuth = (req, res, next) => {
+  if (req.session && req.session.isLoggedIn) {
+    return next(); // User is authenticated, allow entry
+  }
+  res.redirect('/login'); // Public user caught, boot them back to login
+};
+
+// Apply security guard to ALL routes declared below this line
+router.use(checkAuth);
+
 // ── COMPREHENSIVE CITY COMMISSION MATRIX ──
 const cityCommissions = {
   "40 village": 200, "aanaikattiyaveli": 200, "aarayampathy": 150, "aarumukaththan kudiyiruppu": 150,
