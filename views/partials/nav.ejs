@@ -5,7 +5,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    background: #ffffff;
+    background: #000000;
     border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
     z-index: 1000;
     padding: 0.5rem 0 !important;
@@ -27,7 +27,6 @@
     display: flex;
     align-items: center;
     gap: 1.5rem !important;
-    color: #000000;
   }
 
   /* ── DESKTOP DROPDOWN ARCHITECTURE ── */
@@ -132,7 +131,7 @@
   .site-nav__burger span {
     width: 100%;
     height: 2px;
-    background-color: var(--white, #ffffff);
+    background-color: #e74c3c; /* 👈 FIXED: Altered bar line vectors to #e74c3c red */
     border-radius: 2px;
     transition: all 0.25s ease;
   }
@@ -141,7 +140,7 @@
   .site-nav__drawer {
     position: fixed;
     top: 0;
-    right: -320px; /* Positions side menu completely hidden off-screen */
+    right: -320px;
     width: 300px;
     height: 100vh;
     background: #111111;
@@ -155,7 +154,6 @@
     z-index: 1500;
   }
   
-  /* Class invoked via modern JavaScript hooks to display sidebar */
   .site-nav__drawer.is-open {
     transform: translateX(-320px);
   }
@@ -241,10 +239,10 @@
   /* ── 📱 CSS RESPONSIVE DEVICE BREAKPOINT GATES (992px) ── */
   @media (max-width: 992px) {
     .site-nav__links {
-      display: none !important; /* Hide flat desktop row configuration layout */
+      display: none !important;
     }
     .site-nav__burger {
-      display: flex !important; /* Expose mobile touch interactive points */
+      display: flex !important;
     }
   }
 </style>
@@ -333,21 +331,18 @@
     const overlayElement = document.getElementById('navOverlay');
     const sideDrawer = document.getElementById('navDrawer');
 
-    // Function to slide out the sidebar panels
     const openMobileMenu = () => {
       sideDrawer.classList.add('is-open');
       overlayElement.classList.add('is-visible');
-      document.body.style.overflow = 'hidden'; // Lock scrolling on main page behind menu
+      document.body.style.overflow = 'hidden';
     };
 
-    // Function to slide away the drawer elements
     const closeMobileMenu = () => {
       sideDrawer.classList.remove('is-open');
       overlayElement.classList.remove('is-visible');
-      document.body.style.overflow = ''; // Unlock scrolling functionality
+      document.body.style.overflow = '';
     };
 
-    // Event hooks binding touch and click metrics
     if (burgerBtn) burgerBtn.addEventListener('click', openMobileMenu);
     if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
     if (overlayElement) overlayElement.addEventListener('click', closeMobileMenu);
