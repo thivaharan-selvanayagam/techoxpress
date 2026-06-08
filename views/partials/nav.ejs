@@ -1,15 +1,35 @@
 <style>
-  /* ── 🌟 COMPACT HEADER RESETS ── */
+  /* ── DESKTOP HEADER & SPACING LAYOUTS ── */
   .site-nav {
-    padding: 0.5rem 0 !important; /* Forces the header vertical padding to stay slim */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #000000;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    z-index: 1000;
+    padding: 0.5rem 0 !important;
+    box-sizing: border-box;
   }
+  
+  .site-nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 60px;
+    box-sizing: border-box;
+  }
+
   .site-nav__links {
     display: flex;
     align-items: center;
-    gap: 1.5rem !important; /* Optimizes horizontal spacing between text elements */
+    gap: 1.5rem !important;
   }
 
-  /* ── DESKTOP DROPDOWN VIEWPORT ARCHITECTURE ── */
+  /* ── DESKTOP DROPDOWN ARCHITECTURE ── */
   .site-nav__dropdown {
     position: relative;
     display: inline-block;
@@ -23,7 +43,7 @@
     color: var(--white, #ffffff);
     font-size: 0.95rem;
     font-weight: 500;
-    transition: color var(--speed);
+    transition: color 0.2s ease;
     padding: 0.5rem 0;
   }
 
@@ -41,7 +61,6 @@
     transition: transform 0.25s ease;
   }
   
-  /* Rotates chevron vector indicator on dropdown hover */
   .site-nav__dropdown:hover .site-nav__dropdown-toggle svg {
     transform: rotate(180deg);
   }
@@ -51,7 +70,7 @@
     top: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background: #111111; /* Dark tech match for your console styling */
+    background: #111111;
     border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
     border-radius: var(--radius, 6px);
     min-width: 210px;
@@ -95,9 +114,84 @@
     color: var(--orange, #D44F0A) !important;
   }
 
-  /* ── 📱 MOBILE SUB-GROUP ACCORDION STYLES ── */
+  /* ── 📱 RESPONSIVE TOUCH BURGER TOGGLE ELEMENT ── */
+  .site-nav__burger {
+    display: none; /* Initially hidden on desktop displays */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 26px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1200;
+  }
+  
+  .site-nav__burger span {
+    width: 100%;
+    height: 2px;
+    background-color: var(--white, #ffffff);
+    border-radius: 2px;
+    transition: all 0.25s ease;
+  }
+
+  /* ── 📱 MOBILE APP-STYLE SLIDEOUT DRAWER PANEL ── */
+  .site-nav__drawer {
+    position: fixed;
+    top: 0;
+    right: -320px; /* Positions side menu completely hidden off-screen */
+    width: 300px;
+    height: 100vh;
+    background: #111111;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+    padding: 5rem 2rem 2rem 2rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1500;
+  }
+  
+  /* Class invoked via modern JavaScript hooks to display sidebar */
+  .site-nav__drawer.is-open {
+    transform: translateX(-320px);
+  }
+  
+  .site-nav__drawer-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    color: var(--white, #ffffff);
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+  
+  .site-nav__drawer-close:hover {
+    color: var(--orange, #D44F0A);
+  }
+
+  .site-nav__drawer a {
+    color: var(--white, #ffffff);
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    transition: color 0.2s;
+    text-align: left;
+    display: block;
+  }
+
+  .site-nav__drawer a.is-active {
+    color: var(--orange, #D44F0A);
+  }
+
   .site-nav__drawer-group {
-    margin: 0.75rem 0;
+    margin: 0.5rem 0;
     padding-left: 1rem;
     border-left: 2px solid var(--orange, #D44F0A);
     display: flex;
@@ -107,7 +201,7 @@
   
   .site-nav__drawer-group-title {
     font-family: var(--font-mono, monospace);
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted, #64748b);
@@ -117,9 +211,40 @@
   }
   
   .site-nav__drawer-group a {
-    font-size: 1.25rem !important;
+    font-size: 1.15rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
+  }
+
+  /* ── 📱 BACKDROP BLUR MASK BLANKET OVERLAY ── */
+  .site-nav__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s;
+    z-index: 1400;
+  }
+  
+  .site-nav__overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ── 📱 CSS RESPONSIVE DEVICE BREAKPOINT GATES (992px) ── */
+  @media (max-width: 992px) {
+    .site-nav__links {
+      display: none !important; /* Hide flat desktop row configuration layout */
+    }
+    .site-nav__burger {
+      display: flex !important; /* Expose mobile touch interactive points */
+    }
   }
 </style>
 
@@ -199,3 +324,31 @@
   
   <div class="site-nav__overlay" id="navOverlay"></div>
 </header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const burgerBtn = document.getElementById('navBurger');
+    const closeBtn = document.getElementById('navClose');
+    const overlayElement = document.getElementById('navOverlay');
+    const sideDrawer = document.getElementById('navDrawer');
+
+    // Function to slide out the sidebar panels
+    const openMobileMenu = () => {
+      sideDrawer.classList.add('is-open');
+      overlayElement.classList.add('is-visible');
+      document.body.style.overflow = 'hidden'; // Lock scrolling on main page behind menu
+    };
+
+    // Function to slide away the drawer elements
+    const closeMobileMenu = () => {
+      sideDrawer.classList.remove('is-open');
+      overlayElement.classList.remove('is-visible');
+      document.body.style.overflow = ''; // Unlock scrolling functionality
+    };
+
+    // Event hooks binding touch and click metrics
+    if (burgerBtn) burgerBtn.addEventListener('click', openMobileMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
+    if (overlayElement) overlayElement.addEventListener('click', closeMobileMenu);
+  });
+</script>
