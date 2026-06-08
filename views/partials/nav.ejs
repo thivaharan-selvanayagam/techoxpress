@@ -79,9 +79,9 @@
 
   /* ── 📱 MOBILE SUB-GROUP ACCORDION STYLES ── */
   .site-nav__drawer-group {
-    margin: 0.25rem 0;
+    margin: 0.75rem 0;
     padding-left: 1rem;
-    border-left: 2px solid var(--border, rgba(15, 23, 42, 0.08));
+    border-left: 2px solid var(--orange, #D44F0A);
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
@@ -99,8 +99,9 @@
   }
   
   .site-nav__drawer-group a {
-    font-size: 1.35rem !important;
+    font-size: 1.25rem !important;
     font-weight: 700 !important;
+    margin: 0 !important;
   }
 </style>
 
@@ -132,7 +133,7 @@
       <a href="/services"      class="<%= page==='services'   ? 'is-active':'' %>">Services</a>
       <a href="/tracking"      class="<%= page==='tracking'   ? 'is-active':'' %>">Track Shipment</a>
       
-      <!-- 👁️ CONDITIONAL STAFF CONTROL TOWERS -->
+      <!-- 👁️ CONDITIONAL STAFF CONTROL TOWERS (DESKTOP) -->
       <% if (isLoggedIn) { %>
         <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
         <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
@@ -152,22 +153,30 @@
     </button>
   </div>
 
-  <!-- RESPONSIVE DRAWER OVERLAY -->
+  <!-- RESPONSIVE DRAWER OVERLAY (MOBILE) -->
   <div class="site-nav__drawer" id="navDrawer">
     <button class="site-nav__drawer-close" id="navClose" aria-label="Close menu">✕</button>
     <a href="/" class="<%= page==='home' ? 'is-active':'' %>">Home</a>
     <a href="/services" class="<%= page==='services' ? 'is-active':'' %>">Services</a>
     
-    <!-- 🌟 ORGANIZED COMPACT MOBILE ACCORDION GROUP -->
-    <div class="site-nav__drawer-group">
-      <div class="site-nav__drawer-group-title">Terminal Operations</div>
+    <!-- 👁️ SECURITY GATEWAY: CONDITIONAL MOBILE DRAWER RENDERING -->
+    <% if (isLoggedIn) { %>
+      <!-- Rendered exclusively for logged-in operators -->
+      <div class="site-nav__drawer-group">
+        <div class="site-nav__drawer-group-title">Terminal Operations</div>
+        <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
+        <a href="/dispatch" class="<%= page==='dispatch' ? 'is-active':'' %>">Dispatch Desk</a>
+        <a href="/dispatch/add" class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
+        <a href="/dispatch/report" class="<%= page==='report' ? 'is-active':'' %>">Ledger Reports</a>
+      </div>
+      <a href="/logout" style="color: #e74c3c !important;">Logout ✕</a>
+    <% } else { %>
+      <!-- Rendered for public clients & unauthenticated visitors -->
       <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
-      <a href="/dispatch" class="<%= page==='dispatch' ? 'is-active':'' %>">Dispatch Desk</a>
-      <a href="/dispatch/add" class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
-      <a href="/dispatch/report" class="<%= page==='report' ? 'is-active':'' %>">Ledger Reports</a>
-    </div>
+      <a href="/about" class="<%= page==='about' ? 'is-active':'' %>">About</a>
+      <a href="/login" class="<%= page==='login' ? 'is-active':'' %>">Staff Login ➔</a>
+    <% } %>
     
-    <a href="/about" class="<%= page==='about' ? 'is-active':'' %>">About</a>
     <a href="/contact" style="margin-top: 1rem; text-align: center; display: block; background: var(--orange); color: white; padding: 0.8rem; border-radius: var(--radius); font-weight: bold; text-decoration: none;">Get a Quote</a>
   </div>
   
