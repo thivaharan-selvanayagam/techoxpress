@@ -1,10 +1,14 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const session = require('express-session'); // 🌟 MOVE 1: Brought imports cleanly to the top
+const session = require('express-session');
+const MongoStore = require('connect-mongo'); // 👈 1. Added MongoDB storage driver module
 require('dotenv').config(); // Load environment configurations
 
 const app = express();
+
+// ── VERCEL PROXY TERMINATION RULES ──
+app.set('trust proxy', 1); // 👈 2. Tells Express to trust secure SSL handshakes routing through Vercel's edge nodes
 
 // ── SERVERLESS CONNECTION OPTIMIZATION ──
 const connectDB = async () => {
@@ -33,12 +37,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ── 🔒 MOVE 2: SESSION MANAGEMENT CONFIGURATION (Must execute before routes) ──
+// ── 🔒 PERSISTENT DISTRIBUTED SESSION HOOKS (Must execute before routes) ──
 app.use(session({
   secret: 'techo_xpress_secure_matrix_key_2026', 
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Session expires automatically after 24 hours
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI, // 👈 3. Forwards session keys straight to Atlas Cluster
+    collectionName: 'sessions',        // Created automatically as a 'sessions' collection collection
+    ttl: 24 * 60 * 60                  // Session lifespan set to 24 hours
+  }),
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production', // Encrypts cookies only over HTTPS when live on Vercel
+    sameSite: 'lax'
+  }
 }));
 
 // Global variables middleware: Passes login status automatically to ALL your EJS files
@@ -49,7 +62,7 @@ app.use((req, res, next) => {
 
 // ── SYSTEM ROUTING CHANNELS ──
 app.use('/',         require('./routes/home'));
-app.use('/',         require('./routes/auth'));     // 👈 🌟 LINKED YOUR AUTHENTICATION ROUTER HERE!
+app.use('/',         require('./routes/auth'));     
 app.use('/services', require('./routes/services'));
 app.use('/tracking', require('./routes/tracking'));
 app.use('/about',    require('./routes/about'));
