@@ -25,7 +25,7 @@ const cityCommissions = {
   "kaankeyanodai": 150, "kaayankeny": 150, "kadaloor (santhiveli)": 150, "kadaloor - santhiveli": 150,
   "kadukamunai": 150, "kalkudah": 150, "kallady": 150, "kallady mugathuvaram": 150, "kallady uppodai": 150,
   "kallady veloor": 150, "kalladytheru": 150, "kalliyankadu": 150, "kalumunthaveli": 200, "kaluthavalai": 150,
-  "kaluwanchikudi": 150, "kaluwankeny": 150, "kannakipuram": 200, "kannankudah": 150, "karadiyanaru": 150,
+  "kaluthavalai": 150, "kaluwanchikudi": 150, "kaluwankeny": 150, "kannakipuram": 200, "kannankudah": 150, "karadiyanaru": 150,
   "karaiyaakan theevu": 150, "karavetti": 200, "karuvakeny": 150, "karuveppankerni": 150, "katchenai": 150,
   "kathankudy": 150, "kathiraveli": 200, "kawathamunai": 150, "kiran": 150, "kirankulam": 150, "kiththul": 200,
   "kokkatichcholai": 150, "kokkuvil": 150, "komathurai": 150, "koorakallimadu": 150, "kooraveli": 150,
@@ -92,13 +92,11 @@ router.get('/', async (req, res) => {
 // ── GET: Render Standalone In-Office Hub Inventory Console ──
 router.get('/office', async (req, res) => {
   try {
-    // Queries all packages currently physically located within the office floor walls
     const officeParcels = await Parcel.find({ 
       assignedRider: null, 
       status: { $ne: 'delivered' } 
     });
 
-    // Calculate total collection liabilities on the fly for summary blocks
     const totalCodValue = officeParcels.reduce((sum, parcel) => sum + (parcel.codPrice || 0), 0);
 
     res.render('office-inventory', {
@@ -112,6 +110,17 @@ router.get('/office', async (req, res) => {
   } catch (err) {
     console.error('Inventory route rendering failure:', err);
     res.status(500).send("Warehouse Asset Pipeline System Failure.");
+  }
+});
+
+// ── POST: Permanently Delete an Entire Parcel ──
+router.post('/delete/:id', async (req, res) => {
+  try {
+    await Parcel.findByIdAndDelete(req.params.id);
+    res.redirect('/dispatch/office'); // Refresh page following deletion
+  } catch (err) {
+    console.error('Core registry deletion fault:', err);
+    res.redirect('/dispatch/office');
   }
 });
 
@@ -146,18 +155,15 @@ router.post('/report', async (req, res) => {
     const chosenRider = await Rider.findById(riderId);
     if (!chosenRider) throw new Error("Selected rider profile not found in database registries.");
 
-    // Lock date limits strictly matching Sri Lankan Midnight offsets (+05:30)
     const absoluteStart = new Date(startDate + "T00:00:00+05:30");
     const absoluteEnd = new Date(endDate + "T23:59:59+05:30");
 
-    // Fetch all successfully completed matching parcel parameters
     const deliveredParcels = await Parcel.find({
       assignedRider: riderId,
       status: 'delivered',
       updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
     });
 
-    // Run Accounting Algorithms
     let totalCommissionEarned = 0;
     let totalCollectedCOD = 0;
 
