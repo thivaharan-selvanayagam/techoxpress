@@ -1,0 +1,72 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<section class="page-hero" style="padding: 3rem 0 2rem 0;">
+  <div class="page-hero__bg"></div>
+  <div class="page-hero__accent"></div>
+  <div class="container">
+    <div class="page-hero__label">Logistics Infrastructure Subsystem</div>
+    <h1 class="page-hero__title" style="font-size: 2.5rem; line-height: 3rem;">OFFICE WAREHOUSE<br><em>INVENTORY STACKS.</em></h1>
+  </div>
+</section>
+
+<section class="dispatch-page" style="padding-top: 2rem; padding-bottom: 6rem;">
+  <div class="container">
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+      <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; color: var(--muted);">Physical Cargo Volume</div>
+        <div style="font-size: 2rem; font-weight: bold; color: var(--white); margin-top: 0.5rem;"><%= officeParcels.length %> <span style="font-size: 1rem; color: var(--muted); font-weight: normal;">Parcels</span></div>
+      </div>
+      <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; color: var(--muted);">Total Outstanding COD Vault Liability</div>
+        <div style="font-size: 2rem; font-weight: bold; color: #2ecc71; margin-top: 0.5rem;">LKR <%= totalCodValue.toLocaleString() %></div>
+      </div>
+    </div>
+
+    <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.25rem; color: var(--white); font-family: var(--font-mono); margin: 0;">📦 CURRENTLY HELD AT HUB TERMINAL</h2>
+        <a href="/dispatch" style="color: var(--orange); font-family: var(--font-mono); font-size: 0.85rem; text-decoration: none;">Go to Dispatch Desk ➔</a>
+      </div>
+
+      <% if (officeParcels.length === 0) { %>
+        <div style="padding: 5rem 0; text-align: center; color: var(--muted); font-style: italic; font-family: var(--font-mono); font-size: 0.95rem;">
+          📭 Hub floor completely clear. No manifests resting in the office bounds.
+        </div>
+      <% } else { %>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.88rem; text-align: left; color: var(--white); min-width: 600px;">
+            <thead>
+              <tr style="color: var(--muted); text-transform: uppercase; font-size: 0.75rem; border-bottom: 2px solid var(--border);">
+                <th style="padding: 1rem 0.5rem;">Tracking ID</th>
+                <th style="padding: 1rem 0.5rem;">Sender Profile</th>
+                <th style="padding: 1rem 0.5rem;">Recipient Address</th>
+                <th style="padding: 1rem 0.5rem;">Manifest Label</th>
+                <th style="padding: 1rem 0.5rem; text-align: right;">COD Valuation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% officeParcels.forEach(parcel => { %>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+                  <td style="padding: 1rem 0.5rem; font-weight: bold; color: var(--orange);"><%= parcel.trackingId %></td>
+                  <td style="padding: 1rem 0.5rem; color: #94a3b8;"><%= parcel.sender %></td>
+                  <td style="padding: 1rem 0.5rem; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= parcel.recipient %></td>
+                  <td style="padding: 1rem 0.5rem;">
+                    <span style="font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: bold; background: <%= parcel.statusLabel === 'Returned to Hub' ? 'rgba(231, 76, 60, 0.15)' : 'rgba(52, 152, 219, 0.15)' %>; color: <%= parcel.statusLabel === 'Returned to Hub' ? '#e74c3c' : '#3498db' %>;">
+                      <%= parcel.statusLabel || 'Manifested' %>
+                    </span>
+                  </td>
+                  <td style="padding: 1rem 0.5rem; text-align: right; font-weight: bold;">LKR <%= (parcel.codPrice || 0).toLocaleString() %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</section>
+
+<%- include('partials/footer') %>

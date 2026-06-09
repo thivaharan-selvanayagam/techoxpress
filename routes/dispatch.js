@@ -63,7 +63,7 @@ const getSriLankaTiming = () => {
   return { currentTime, currentDate };
 };
 
-// GET: Load main terminal window data packages
+// ── GET: Load main terminal window data packages ──
 router.get('/', async (req, res) => {
   try {
     const allRiders = await Rider.find({});
@@ -89,12 +89,38 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET: Render the New Parcel Intake Form
+// ── GET: Render Standalone In-Office Hub Inventory Console ──
+router.get('/office', async (req, res) => {
+  try {
+    // Queries all packages currently physically located within the office floor walls
+    const officeParcels = await Parcel.find({ 
+      assignedRider: null, 
+      status: { $ne: 'delivered' } 
+    });
+
+    // Calculate total collection liabilities on the fly for summary blocks
+    const totalCodValue = officeParcels.reduce((sum, parcel) => sum + (parcel.codPrice || 0), 0);
+
+    res.render('office-inventory', {
+      title: 'Office Hub Assets — Techo Xpress',
+      page: 'office-inventory',
+      officeParcels,
+      totalCodValue,
+      success: false,
+      error: null
+    });
+  } catch (err) {
+    console.error('Inventory route rendering failure:', err);
+    res.status(500).send("Warehouse Asset Pipeline System Failure.");
+  }
+});
+
+// ── GET: Render the New Parcel Intake Form ──
 router.get('/add', (req, res) => {
   res.render('add-parcel', { title: 'New Parcel Intake — Techo Xpress', page: 'add-parcel', success: false, error: null });
 });
 
-// GET: Render the Rider Performance Reports Selection Console
+// ── GET: Render the Rider Performance Reports Selection Console ──
 router.get('/report', async (req, res) => {
   try {
     const ridersList = await Rider.find({});
@@ -111,7 +137,7 @@ router.get('/report', async (req, res) => {
   }
 });
 
-// POST: Query, Process, and Calculate Metrics for Selected Rider and Date Range
+// ── POST: Query, Process, and Calculate Metrics for Selected Rider and Date Range ──
 router.post('/report', async (req, res) => {
   const { riderId, startDate, endDate } = req.body;
 
@@ -179,7 +205,7 @@ router.post('/report', async (req, res) => {
   }
 });
 
-// POST: Process Intake Form and Instantiate a New Cloud Parcel Document
+// ── POST: Process Intake Form and Instantiate a New Cloud Parcel Document ──
 router.post('/add', async (req, res) => {
   const { trackingId, sender, recipient, weight, service, codPrice } = req.body;
   const cleanId = (trackingId || '').trim().toUpperCase();
@@ -205,7 +231,7 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// POST: Bind outbound manifest arrays to target riders
+// ── POST: Bind outbound manifest arrays to target riders ──
 router.post('/commit', async (req, res) => {
   const { riderId, trackingIds } = req.body;
   const parsedIds = Array.isArray(trackingIds) ? trackingIds : [trackingIds].filter(Boolean);
@@ -231,7 +257,7 @@ router.post('/commit', async (req, res) => {
   }
 });
 
-// POST: Close Route Workflow (Closing-by-Exception Audit Engine)
+// ── POST: Close Route Workflow (Closing-by-Exception Audit Engine) ──
 router.post('/close-route', async (req, res) => {
   const { riderId, remainingIds } = req.body;
   const parsedRemaining = Array.isArray(remainingIds) ? remainingIds : [remainingIds].filter(Boolean);
@@ -285,7 +311,7 @@ router.post('/close-route', async (req, res) => {
   }
 });
 
-// POST: Clear Ledger Cash Receivables
+// ── POST: Clear Ledger Cash Receivables ──
 router.post('/clear-balance', async (req, res) => {
   const { riderId } = req.body;
   try {

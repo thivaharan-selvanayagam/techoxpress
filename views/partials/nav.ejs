@@ -280,9 +280,9 @@
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div class="site-nav__dropdown-menu">
-            <a href="/dispatch"        class="<%= page==='dispatch'   ? 'is-active':'' %>">Dispatch Desk</a>
-            <a href="/dispatch/add"    class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
-            <a href="/dispatch/report" class="<%= page==='report'     ? 'is-active':'' %>">Ledger Reports</a>
+            <a href="/dispatch"        class="<%= page==='dispatch'         ? 'is-active':'' %>">Dispatch Desk</a>
+            <a href="/dispatch/office" class="<%= page==='office-inventory' ? 'is-active':'' %>">Office Inventory</a> <a href="/dispatch/add"    class="<%= page==='add-parcel'       ? 'is-active':'' %>">Parcel Intake</a>
+            <a href="/dispatch/report" class="<%= page==='report'           ? 'is-active':'' %>">Ledger Reports</a>
           </div>
         </div>
         <a href="/logout"          style="color: #e74c3c;">Logout ✕</a>
@@ -307,10 +307,10 @@
     <% if (isLoggedIn) { %>
       <div class="site-nav__drawer-group">
         <div class="site-nav__drawer-group-title">Terminal Operations</div>
-        <a href="/tracking" class="<%= page==='tracking' ? 'is-active':'' %>">Track Shipment</a>
-        <a href="/dispatch" class="<%= page==='dispatch' ? 'is-active':'' %>">Dispatch Desk</a>
-        <a href="/dispatch/add" class="<%= page==='add-parcel' ? 'is-active':'' %>">Parcel Intake</a>
-        <a href="/dispatch/report" class="<%= page==='report' ? 'is-active':'' %>">Ledger Reports</a>
+        <a href="/tracking"        class="<%= page==='tracking'         ? 'is-active':'' %>">Track Shipment</a>
+        <a href="/dispatch"        class="<%= page==='dispatch'         ? 'is-active':'' %>">Dispatch Desk</a>
+        <a href="/dispatch/office" class="<%= page==='office-inventory' ? 'is-active':'' %>">Office Inventory</a> <a href="/dispatch/add"    class="<%= page==='add-parcel'       ? 'is-active':'' %>">Parcel Intake</a>
+        <a href="/dispatch/report" class="<%= page==='report'           ? 'is-active':'' %>">Ledger Reports</a>
       </div>
       <a href="/logout" style="color: #e74c3c !important;">Logout ✕</a>
     <% } else { %>
