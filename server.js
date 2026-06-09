@@ -2,13 +2,13 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // 👈 1. Added MongoDB storage driver module
+const MongoStore = require('connect-mongo');
 require('dotenv').config(); // Load environment configurations
 
 const app = express();
 
 // ── VERCEL PROXY TERMINATION RULES ──
-app.set('trust proxy', 1); // 👈 2. Tells Express to trust secure SSL handshakes routing through Vercel's edge nodes
+app.set('trust proxy', 1);
 
 // ── SERVERLESS CONNECTION OPTIMIZATION ──
 const connectDB = async () => {
@@ -37,26 +37,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ── 🔒 PERSISTENT DISTRIBUTED SESSION HOOKS (Must execute before routes) ──
-app.use(session({
-  secret: 'techo_xpress_secure_matrix_key_2026', 
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI, // 👈 3. Forwards session keys straight to Atlas Cluster
-    collectionName: 'sessions',        // Created automatically as a 'sessions' collection collection
-    ttl: 24 * 60 * 60                  // Session lifespan set to 24 hours
-  }),
-  cookie: { 
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === 'production', // Encrypts cookies only over HTTPS when live on Vercel
-    sameSite: 'lax'
+// ── 🔒 LAZY-LOADED SERVERLESS SESSION STORAGE MIDDLEWARE ──
+let lazySessionMiddleware;
+
+app.use((req, res, next) => {
+  // Instantiates the store pool ONLY when a live visitor hits the site container
+  if (!lazySessionMiddleware) {
+    const storeConfig = process.env.MONGODB_URI 
+      ? MongoStore.create({
+          mongoUrl: process.env.MONGODB_URI,
+          collectionName: 'sessions',
+          ttl: 24 * 60 * 60
+        })
+      : undefined;
+
+    lazySessionMiddleware = session({
+      secret: 'techo_xpress_secure_matrix_key_2026', 
+      resave: false,
+      saveUninitialized: false,
+      store: storeConfig,
+      cookie: { 
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'lax'
+      }
+    });
   }
-}));
+  // Pass execution down to the dynamically compiled session store runner
+  lazySessionMiddleware(req, res, next);
+});
 
 // Global variables middleware: Passes login status automatically to ALL your EJS files
 app.use((req, res, next) => {
-  res.locals.isLoggedIn = req.session.isLoggedIn || false;
+  res.locals.isLoggedIn = req.session ? req.session.isLoggedIn : false;
   next();
 });
 
@@ -80,5 +93,5 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Techo Xpress Engine running on http://localhost:${PORT}`));
 }
 
-// ── 🔒 CRITICAL EXPORT LINE (Must sit at the absolute bottom of the pipeline) ──
+// ── CRITICAL EXPORT LINE ──
 module.exports = app;
