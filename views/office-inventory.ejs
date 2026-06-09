@@ -81,11 +81,19 @@
 
                   <!-- 🚨 NEW: INSTANT CLOUD REMOVAL ACTION FORM -->
                   <td style="padding: 1rem 0.75rem; text-align: center;">
-                    <form action="/dispatch/delete/<%= parcel._id %>" method="POST" onsubmit="return confirm('⚠️ PERMANENT AUDIT DELETION WARNING:\n\nAre you absolutely sure you want to completely erase parcel <%= parcel.trackingId %> from the cloud manifest registry? This action is irreversible.');" style="margin: 0; display: inline-block;">
-                      <button type="submit" style="background: #e74c3c; color: #ffffff; border: none; padding: 0.4rem 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; border-radius: 4px; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                        Delete ✕
-                      </button>
-                    </form>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
+                      
+                      <a href="/dispatch/edit/<%= parcel._id %>" style="background: #3498db; color: #ffffff; text-decoration: none; padding: 0.4rem 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; border-radius: 4px; transition: opacity 0.2s; display: inline-block;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                        Edit 📝
+                      </a>
+
+                      <form action="/dispatch/delete/<%= parcel._id %>" method="POST" onsubmit="return confirm('⚠️ PERMANENT AUDIT DELETION WARNING:\n\nAre you absolutely sure you want to completely erase parcel <%= parcel.trackingId %> from the cloud manifest registry? This action is irreversible.');" style="margin: 0; display: inline-block;">
+                        <button type="submit" style="background: #e74c3c; color: #ffffff; border: none; padding: 0.4rem 0.8rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; border-radius: 4px; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                          Delete ✕
+                        </button>
+                      </form>
+
+                    </div>
                   </td>
 
                 </tr>

@@ -113,6 +113,59 @@ router.get('/office', async (req, res) => {
   }
 });
 
+
+// ── GET: Render the Edit Form for a Specific Parcel ──
+router.get('/edit/:id', async (req, res) => {
+  try {
+    const parcel = await Parcel.findById(req.params.id);
+    if (!parcel) throw new Error('Parcel record not found.');
+    
+    res.render('edit-parcel', {
+      title: 'Modify Shipment Manifest — Techo Xpress',
+      page: 'office-inventory',
+      parcel,
+      error: null
+    });
+  } catch (err) {
+    console.error('Edit route render failure:', err);
+    res.redirect('/dispatch/office');
+  }
+});
+
+// ── POST: Process the Edit Form and Update MongoDB ──
+router.post('/edit/:id', async (req, res) => {
+  const { sender, recipient, weight, service, codPrice } = req.body;
+  
+  try {
+    // Dynamic Commission Re-calculation in case the city was changed
+    const searchCityKey = (recipient || '').trim().toLowerCase();
+    const updatedCommission = cityCommissions[searchCityKey] || 150;
+
+    await Parcel.findByIdAndUpdate(req.params.id, {
+      $set: {
+        sender: sender.trim(),
+        recipient: recipient.trim(),
+        weight: weight.trim(),
+        service,
+        codPrice: Number(codPrice) || 0,
+        commission: updatedCommission
+      }
+    });
+
+    res.redirect('/dispatch/office'); // Take back to inventory sheet on success
+  } catch (err) {
+    console.error('Failed to update parcel parameters:', err);
+    const fallbackParcel = await Parcel.findById(req.params.id).catch(() => null);
+    res.render('edit-parcel', {
+      title: 'Modify Shipment Manifest — Techo Xpress',
+      page: 'office-inventory',
+      parcel: fallbackParcel,
+      error: `Database update failure: ${err.message}`
+    });
+  }
+});
+
+
 // ── POST: Permanently Delete an Entire Parcel ──
 router.post('/delete/:id', async (req, res) => {
   try {
