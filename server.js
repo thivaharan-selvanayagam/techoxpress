@@ -37,39 +37,59 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ── 🔒 LAZY-LOADED SERVERLESS SESSION STORAGE MIDDLEWARE ──
+// ── 🔒 LAZY-LOADED SERVERLESS SESSION STORAGE MIDDLEWARE WITH ERROR CATCHING ──
 let lazySessionMiddleware;
 
 app.use((req, res, next) => {
-  // Instantiates the store pool ONLY when a live visitor hits the site container
   if (!lazySessionMiddleware) {
-    const storeConfig = process.env.MONGODB_URI 
-      ? MongoStore.create({
+    try {
+      let storeConfig;
+
+      if (process.env.MONGODB_URI) {
+        storeConfig = MongoStore.create({
           mongoUrl: process.env.MONGODB_URI,
           collectionName: 'sessions',
-          ttl: 24 * 60 * 60
-        })
-      : undefined;
+          ttl: 24 * 60 * 60,
+          mongoOptions: {
+            connectTimeoutMS: 15000, // Gives serverless cold-starts ample time to authenticating
+            socketTimeoutMS: 45000
+          }
+        });
 
-    lazySessionMiddleware = session({
-      secret: 'techo_xpress_secure_matrix_key_2026', 
-      resave: false,
-      saveUninitialized: false,
-      store: storeConfig,
-      cookie: { 
-        maxAge: 24 * 60 * 60 * 1000,
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'lax'
+        // 🛡️ Catch asynchronous database connection errors before they cause a Vercel 500 invocation crash
+        storeConfig.on('error', function(mongoStoreError) {
+          console.error("⚠️ MongoStore Session Async Connection Error:", mongoStoreError);
+        });
       }
-    });
+
+      lazySessionMiddleware = session({
+        secret: 'techo_xpress_secure_matrix_key_2026', 
+        resave: false,
+        saveUninitialized: false,
+        store: storeConfig,
+        cookie: { 
+          maxAge: 24 * 60 * 60 * 1000,
+          secure: process.env.NODE_ENV === 'production', 
+          sameSite: 'lax'
+        }
+      });
+    } catch (setupError) {
+      console.error("⚠️ Fallback activated: Session store initialization faulted:", setupError);
+      // Fail-safe fallback to temporary memory instance so your app never dies with a 500 error
+      lazySessionMiddleware = session({
+        secret: 'techo_xpress_secure_matrix_key_2026',
+        resave: false,
+        saveUninitialized: false,
+        cookie: { maxAge: 24 * 60 * 60 * 1000, secure: false, sameSite: 'lax' }
+      });
+    }
   }
-  // Pass execution down to the dynamically compiled session store runner
   lazySessionMiddleware(req, res, next);
 });
 
 // Global variables middleware: Passes login status automatically to ALL your EJS files
 app.use((req, res, next) => {
-  res.locals.isLoggedIn = req.session ? req.session.isLoggedIn : false;
+  res.locals.isLoggedIn = (req.session && req.session.isLoggedIn) ? req.session.isLoggedIn : false;
   next();
 });
 
@@ -85,6 +105,21 @@ app.use('/dispatch', require('./routes/dispatch'));
 // ── BRANDED 404 ERROR HANDLER ──
 app.use((req, res) => {
   res.status(404).render('404', { title: '404 — Techo Xpress', page: '404' });
+});
+
+// ── 🛠️ REAL-TIME SYSTEM FAULT DIAGNOSTIC INTERCEPTOR ──
+// Catches any uncaught exceptions globally and forces a readable layout printout
+app.use((err, req, res, next) => {
+  console.error('💥 CRITICAL ENGINE FAULT:', err.stack);
+  res.status(500).send(`
+    <div style="padding: 2.5rem; font-family: monospace; background: #0d0d11; color: #ff5555; border-radius: var(--radius); margin: 2rem; border: 1px solid #e74c3c; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <h2 style="color: #e74c3c; margin-top: 0; font-family: sans-serif; letter-spacing: 0.02em;">Techo Xpress — Application Crash Diagnostic</h2>
+      <p style="color: #fff; font-size: 1.1rem;"><strong>Incident Message:</strong> ${err.message}</p>
+      <div style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">Trace Log Stack Information:</div>
+      <pre style="background: #000000; padding: 1.5rem; color: #94a3b8; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; line-height: 1.4rem; border-radius: 4px;">${err.stack}</pre>
+      <p style="color: #475569; font-size: 0.8rem; margin-top: 1.5rem;">➔ Check your environment setups or database access cluster configurations.</p>
+    </div>
+  `);
 });
 
 // ── EXECUTION BOUNDARIES ──
