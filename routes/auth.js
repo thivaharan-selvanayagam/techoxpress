@@ -10,11 +10,16 @@ router.get('/login', (req, res) => {
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  // Change these credentials to your preferred master login details
   if (username === 'admin' && password === 'techo123') {
     req.session.isLoggedIn = true;
     req.session.user = username;
-    return res.redirect('/dispatch'); // Take them directly to the control room
+    
+    // ── 🔒 FORCE SYNCHRONOUS DATABASE WRITE BEFORE REDIRECTING ──
+    return req.session.save((err) => {
+      if (err) console.error('Session ledger write delay:', err);
+      res.redirect('/dispatch'); // Safely redirect only after the token is secure
+    });
+    
   } else {
     return res.render('login', { 
       title: 'Staff Authentication — Techo Xpress', 
