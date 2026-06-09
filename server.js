@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const cookieSession = require('cookie-session'); // 👈 Swapped out express-session for serverless cookies
 require('dotenv').config(); // Load environment configurations
 
 const app = express();
@@ -10,27 +9,22 @@ const app = express();
 // ── VERCEL PROXY TRUST RULES ──
 app.set('trust proxy', 1);
 
-// ── 💾 NON-BLOCKING SERVERLESS CONNECTION POOL ──
-// We initialize the connection immediately and pass the client promise directly to MongoStore
-const clientPromise = mongoose.connect(process.env.MONGODB_URI, {
-  connectTimeoutMS: 15000,
-  socketTimeoutMS: 45000
-}).then(mongooseInstance => {
-  console.log('💾 Distributed database uplink successfully established.');
-  return mongooseInstance.connection.getClient();
-}).catch(err => {
-  console.error('🔴 Critical Database initialization failure:', err);
-});
-
-// Middleware to ensure database availability on every incoming request
-app.use(async (req, res, next) => {
+// ── SERVERLESS CONNECTION OPTIMIZATION ──
+const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) {
-    return next();
+    return; 
   }
+  console.log('💾 Initializing fresh cloud database connection uplink...');
+  return mongoose.connect(process.env.MONGODB_URI);
+};
+
+// Global interceptor middleware to verify database connection before handling routes
+app.use(async (req, res, next) => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await connectDB();
     next();
   } catch (err) {
+    console.error('🔴 Database connection critical failure during execution:', err);
     res.status(500).send('Logistics Engine Connection Timeout.');
   }
 });
@@ -42,21 +36,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ── 🔒 PERSISTENT DISTRIBUTED SESSION STORE (SHARDS VIA CLIENT PROMISE) ──
-app.use(session({
-  secret: 'techo_xpress_secure_matrix_key_2026', 
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    clientPromise: clientPromise, // 👈 Shares the exact same connection pool seamlessly
-    collectionName: 'sessions',
-    ttl: 24 * 60 * 60
-  }),
-  cookie: { 
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === 'production', 
-    sameSite: 'lax'
-  }
+// ── 🔒 SERVERLESS-OPTIMIZED COOKIE SESSION MIDDLEWARE ──
+app.use(cookieSession({
+  name: 'techo_session',
+  keys: ['techo_xpress_matrix_secret_2026'], // Secret encryption signature key
+  maxAge: 24 * 60 * 60 * 1000, // Session expires automatically after 24 hours
+  secure: process.env.NODE_ENV === 'production', // Encrypts over HTTPS when live on Vercel
+  sameSite: 'lax'
 }));
 
 // Global variables middleware: Passes login status automatically to ALL your EJS files

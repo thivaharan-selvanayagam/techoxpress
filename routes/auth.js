@@ -13,13 +13,7 @@ router.post('/login', (req, res) => {
   if (username === 'admin' && password === 'techo123') {
     req.session.isLoggedIn = true;
     req.session.user = username;
-    
-    // ── 🔒 FORCE SYNCHRONOUS DATABASE WRITE BEFORE REDIRECTING ──
-    return req.session.save((err) => {
-      if (err) console.error('Session ledger write delay:', err);
-      res.redirect('/dispatch'); // Safely redirect only after the token is secure
-    });
-    
+    return res.redirect('/dispatch'); // Instantly redirects without waiting for DB writes
   } else {
     return res.render('login', { 
       title: 'Staff Authentication — Techo Xpress', 
@@ -31,9 +25,8 @@ router.post('/login', (req, res) => {
 
 // GET: Clear Session and Logout
 router.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login');
-  });
+  req.session = null; // 👈 Destroys the cookie session data instantly
+  res.redirect('/login');
 });
 
 module.exports = router;
