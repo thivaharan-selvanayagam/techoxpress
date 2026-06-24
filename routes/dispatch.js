@@ -33,7 +33,7 @@ const cityCommissions = {
   "kumarapuram": 150, "kumburumulai": 150, "kunjankulam": 200, "kurinjamunai": 150, "kurukalmadam": 150,
   "kurumanveli": 150, "maankaadu": 150, "maavadivembu": 150, "mahiladiththeevu": 150, "mahiloor": 150,
   "makilavettuvan": 200, "malaiyrakattu": 200, "mamangam": 150, "manalpitti": 150, "mangikattu": 150,
-  "manjanthoduvaai": 150, "manmunai": 150, "mandoor": 150, "mattikali": 150, "mavadichenai": 150,
+  "manjanthoduvaai": 150, "manmunai": 150, "mandoor": 200, "mattikali": 150, "mavadichenai": 150,
   "mayilampaveli": 150, "meravodai": 150, "munaikaadu": 150, "murakottanchenai": 150, "muruththanai": 200,
   "naavatkaadu": 150, "nadarajananthapuram": 150, "naripulthootam": 200, "nasivantheevu": 150, "navalady": 150,
   "navalady - kallady": 150, "navatkeny": 150, "navatkuda": 150, "nediyavettai": 200, "nochchimunai": 150,
