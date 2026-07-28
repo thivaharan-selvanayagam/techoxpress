@@ -80,23 +80,39 @@
           </form>
         </div>
 
-        <!-- Ledger Registry Card -->
+        <!-- 💵 LEDGER REGISTRY CARD (UPDATED FOR PARTIAL & FULL CASH SETTLEMENTS) -->
         <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
           <h3 style="font-size: 1.1rem; color: #0F172A; font-family: var(--font-head); font-weight: 800; text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; letter-spacing: 0.02em;">🚨 Outstanding Ledger Registry</h3>
-          <div style="max-height: 250px; overflow-y: auto;">
+          <div style="max-height: 350px; overflow-y: auto;">
             <% allRiders.forEach(r => { %>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; gap: 0.5rem;">
-                <span style="color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= r.name %></span>
+              <div style="padding: 0.85rem 0; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; gap: 0.5rem;">
+                  <span style="color: var(--text); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= r.name %></span>
+                  <% if (r.pendingBalance > 0) { %>
+                    <span style="color: #d9534f; font-weight: bold; white-space: nowrap;">Due: LKR <%= r.pendingBalance.toLocaleString() %></span>
+                  <% } else { %>
+                    <span style="color: #10b981; font-weight: 700;">✓ Balanced</span>
+                  <% } %>
+                </div>
+
                 <% if (r.pendingBalance > 0) { %>
-                  <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
-                    <span style="color: #d9534f; font-weight: bold; white-space: nowrap;">LKR <%= r.pendingBalance.toLocaleString() %></span>
-                    <form method="POST" action="/dispatch/clear-balance">
-                      <input type="hidden" name="riderId" value="<%= r._id %>">
-                      <button type="submit" style="background: #10b981; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap;">Cash Received</button>
-                    </form>
-                  </div>
-                <% } else { %>
-                  <span style="color: #10b981; font-weight: 700; flex-shrink: 0;">✓ Balanced</span>
+                  <!-- Form allows entering partial or full payment -->
+                  <form method="POST" action="/dispatch/clear-balance" style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.4rem; flex-wrap: wrap;">
+                    <input type="hidden" name="riderId" value="<%= r._id %>">
+                    <input 
+                      type="number" 
+                      name="receivedAmount" 
+                      value="<%= r.pendingBalance %>" 
+                      max="<%= r.pendingBalance %>" 
+                      min="1" 
+                      placeholder="Amount LKR" 
+                      required 
+                      style="width: 130px; padding: 0.4rem 0.6rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; outline: none;"
+                    >
+                    <button type="submit" style="background: #10b981; border: none; color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap;">
+                      Cash Received 💵
+                    </button>
+                  </form>
                 <% } %>
               </div>
             <% }) %>
@@ -116,7 +132,6 @@
         <% } %>
 
         <% dynamicFleet.forEach(({ rider, activePackages }) => { %>
-          <!-- 🌟 FIXED: Added "close-route-form" layout identifier tag -->
           <div class="contact-form-box" style="margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.015); border-left: 4px solid #D44F0A;">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; gap: 0.5rem;">
               <div>
@@ -151,7 +166,6 @@
                 </div>
               </div>
 
-              <!-- 🌟 FIXED: Shifted from type="submit" to type="button" and assigned the "audit-submit-btn" controller class -->
               <button type="button" class="btn btn-primary audit-submit-btn" style="width: 100%; justify-content: center; background: #e11d48; padding: 0.9rem; border-radius: var(--radius); border: none; font-size: 0.9rem; letter-spacing: 0.02em;">Close Dispatch & Run Financial Audit</button>
             </form>
           </div>
@@ -164,7 +178,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Outbound Manifest Logic (Morning Shift Scanner Protocol)
   const scannerInput = document.getElementById('barcodeScannerInput');
   const queueBody = document.getElementById('manifestQueueBody');
   const emptyRowState = document.getElementById('emptyRowState');
@@ -201,12 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Inbound Returns Matrix Interceptor (Evening Shift Exception Protocol)
   const returnFields = document.querySelectorAll('.return-entry-field');
   returnFields.forEach(field => {
     field.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
-        e.preventDefault(); // Intercept scanner carriage execution paths cleanly
+        e.preventDefault();
         const trackingId = this.value.trim().toUpperCase();
         const riderId = this.getAttribute('data-rider');
         this.value = '';
@@ -232,8 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ── 🌟 THE MOUSE-ONLY SUBMISSION STRATEGY IMPLEMENTATION ──
-  // Block any automated native form submit triggers generated by input nodes
   const closeRouteForms = document.querySelectorAll('.close-route-form');
   closeRouteForms.forEach(form => {
     form.addEventListener('submit', (e) => {
@@ -241,13 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Route submittals solely via programmatic explicit mouse clicks
   const auditBtns = document.querySelectorAll('.audit-submit-btn');
   auditBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       const targetForm = this.closest('form');
       if (targetForm) {
-        targetForm.submit(); // Bypasses browser default submit interceptors smoothly
+        targetForm.submit();
       }
     });
   });

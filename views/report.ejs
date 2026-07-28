@@ -1,7 +1,6 @@
 <%- include('partials/head') %>
 <%- include('partials/nav') %>
 
-<!-- ── LOCALIZED RESPONSIVE GRID ENGINE OVERRIDES ── -->
 <style>
   .report-filter-grid {
     display: grid;
@@ -90,7 +89,6 @@
         
         <div class="report-filter-grid" style="margin-bottom: 1.5rem;">
           
-          <!-- REPORT TYPE SELECTOR -->
           <div class="form-group">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">1. Scope Level *</label>
             <select name="reportType" id="reportTypeSelect" required onchange="toggleScopeInputs()" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
@@ -99,7 +97,6 @@
             </select>
           </div>
 
-          <!-- TIMEFRAME PRESET SELECTOR (WEEKLY / MONTHLY / YEARLY) -->
           <div class="form-group">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">2. Timeframe Window *</label>
             <select name="timeframe" id="timeframeSelect" required onchange="toggleTimeframeInputs()" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
@@ -110,7 +107,6 @@
             </select>
           </div>
 
-          <!-- SINGLE RIDER SELECTOR (SHOWN ONLY IF SINGLE SCOPE IS ACTIVE) -->
           <div class="form-group" id="riderSelectGroup" style="<%= reportType === 'single' ? 'display: block;' : 'display: none;' %>">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Target Rider Unit *</label>
             <select name="riderId" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
@@ -123,7 +119,6 @@
 
         </div>
 
-        <!-- CUSTOM DATE INPUTS (SHOWN ONLY IF 'CUSTOM' TIMEFRAME IS SELECTED) -->
         <div id="customDateGroup" style="<%= timeframe === 'custom' ? 'display: grid;' : 'display: none;' %> grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
           <div class="form-group">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Start Date *</label>
@@ -155,7 +150,6 @@
           <span class="timeframe-badge"><%= summaryData.timeframeLabel %> REPORT</span>
         </div>
 
-        <!-- GRAND TOTAL SCORECARD CARDS -->
         <div class="report-stats-grid">
           <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid var(--orange);">
             <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total Parcels Delivered</div>
@@ -178,7 +172,6 @@
           </div>
         </div>
 
-        <!-- EXECUTIVE SUMMARY RIDER MATRIX TABLE -->
         <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius);">
           <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
             Rider Performance & Financial Ledger Breakdown
@@ -208,7 +201,6 @@
                   </tr>
                 <% }) %>
               </tbody>
-              <!-- GRAND TOTAL FOOTER ROW -->
               <tfoot>
                 <tr style="background: rgba(15, 23, 42, 0.04); font-weight: 800; border-top: 2px solid #0F172A;">
                   <td style="padding: 1rem 0.5rem; color: #0F172A;">BRANCH TOTALS</td>
@@ -255,6 +247,43 @@
           </div>
         </div>
 
+        <!-- 💵 NEW: CASH SETTLEMENT RECEIPTS HISTORY -->
+        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius); margin-bottom: 2rem;">
+          <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; letter-spacing: 0.02em;">
+            💵 Cash Settlement Receipts History
+          </h3>
+          
+          <% if (!reportData.settlements || reportData.settlements.length === 0) { %>
+            <p style="color: var(--muted); font-style: italic; text-align: center; padding: 1.5rem 0; font-weight: 500;">No cash settlement transactions recorded for this courier unit in the selected timeframe.</p>
+          <% } else { %>
+            <div class="table-capsule">
+              <table style="width: 100%; min-width: 550px; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.88rem; color: var(--text);">
+                <thead>
+                  <tr style="border-bottom: 2px solid var(--border); color: var(--muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700;">
+                    <th style="padding: 0.8rem 0.5rem;">Date</th>
+                    <th style="padding: 0.8rem 0.5rem;">Time (SLT)</th>
+                    <th style="padding: 0.8rem 0.5rem; text-align: right;">Amount Received</th>
+                    <th style="padding: 0.8rem 0.5rem; text-align: right;">Remaining Due Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% reportData.settlements.forEach(s => { %>
+                    <tr style="border-bottom: 1px solid var(--border); font-weight: 600;">
+                      <td style="padding: 0.9rem 0.5rem; color: #0F172A; font-weight: 700;">📅 <%= s.dateStr %></td>
+                      <td style="padding: 0.9rem 0.5rem; color: var(--muted);">⏰ <%= s.timeStr %></td>
+                      <td style="padding: 0.9rem 0.5rem; text-align: right; color: #10b981; font-weight: 800;">+ LKR <%= s.amountReceived.toLocaleString() %></td>
+                      <td style="padding: 0.9rem 0.5rem; text-align: right; color: <%= s.remainingBalance > 0 ? '#d9534f' : '#10b981' %>; font-weight: 700;">
+                        LKR <%= s.remainingBalance.toLocaleString() %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- ITEMIZED HISTORICAL LEDGER BREAKDOWN SHEET -->
         <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius);">
           <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Historical Audit Log Breakdown</h3>
           
@@ -292,7 +321,6 @@
   </div>
 </section>
 
-<!-- 🛠️ DYNAMIC FORM INTERACTION LOGIC -->
 <script>
   function toggleScopeInputs() {
     const scope = document.getElementById('reportTypeSelect').value;

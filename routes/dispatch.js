@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Rider = require('../models/Rider');
 const Parcel = require('../models/Parcel');
+const Settlement = require('../models/Settlement'); // 👈 Imported Settlement model
 
 // ── 🔒 SECURITY GUARD MIDDLEWARE INTERCEPTOR ──
 const checkAuth = (req, res, next) => {
   if (req.session && req.session.isLoggedIn) {
-    return next(); // User is authenticated, allow entry
+    return next();
   }
-  res.redirect('/login'); // Public user caught, boot them back to login
+  res.redirect('/login');
 };
 
-// Apply security guard to ALL routes declared below this line
 router.use(checkAuth);
 
 // ── COMPREHENSIVE CITY COMMISSION MATRIX ──
@@ -61,21 +61,14 @@ const calculateParcelCommission = (parcel, rider = null) => {
   const serviceName = (parcel.service || '').trim().toLowerCase();
   const isTemu = senderName.includes('temu') || serviceName.includes('temu');
 
-  // RULE 1: All Temu parcels have a fixed LKR 150 commission for any rider & any city
-  if (isTemu) {
-    return 150;
-  }
+  if (isTemu) return 150;
 
-  // RULE 2: Sathees koombiyo (RIDER-002) gets LKR 200 for every non-Temu parcel
   if (rider) {
     const isSathees = (rider.riderId === 'RIDER-002') || 
                       (rider.name && rider.name.toLowerCase().includes('sathees'));
-    if (isSathees) {
-      return 200;
-    }
+    if (isSathees) return 200;
   }
 
-  // RULE 3: Standard City Commission Matrix (Default: LKR 150)
   const recipientCity = (parcel.recipient || '').trim().toLowerCase();
   return cityCommissions[recipientCity] || 150;
 };
@@ -84,11 +77,12 @@ const calculateParcelCommission = (parcel, rider = null) => {
 const getSriLankaTiming = () => {
   const optionsTime = { timeZone: 'Asia/Colombo', hour: '2-digit', minute: '2-digit', hour12: true };
   const currentTime = new Date().toLocaleTimeString('en-US', optionsTime);
-  const currentDate = 'Today';
+  const optionsDate = { timeZone: 'Asia/Colombo', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const currentDate = new Date().toLocaleDateString('sv-SE', optionsDate); // YYYY-MM-DD
   return { currentTime, currentDate };
 };
 
-// ── GET: Load main terminal window data packages ──
+// ── GET: Load main terminal window ──
 router.get('/', async (req, res) => {
   try {
     const allRiders = await Rider.find({});
@@ -151,7 +145,6 @@ router.get('/edit/:id', async (req, res) => {
       error: null
     });
   } catch (err) {
-    console.error('Edit route render failure:', err);
     res.redirect('/dispatch/office');
   }
 });
@@ -159,7 +152,6 @@ router.get('/edit/:id', async (req, res) => {
 // ── POST: Process the Edit Form and Update MongoDB ──
 router.post('/edit/:id', async (req, res) => {
   const { sender, recipient, weight, service, codPrice } = req.body;
-  
   try {
     const parcel = await Parcel.findById(req.params.id);
     if (!parcel) throw new Error('Parcel not found.');
@@ -185,7 +177,6 @@ router.post('/edit/:id', async (req, res) => {
 
     res.redirect('/dispatch/office');
   } catch (err) {
-    console.error('Failed to update parcel parameters:', err);
     const fallbackParcel = await Parcel.findById(req.params.id).catch(() => null);
     res.render('edit-parcel', {
       title: 'Modify Shipment Manifest — Techo Xpress',
@@ -202,7 +193,6 @@ router.post('/delete/:id', async (req, res) => {
     await Parcel.findByIdAndDelete(req.params.id);
     res.redirect('/dispatch/office');
   } catch (err) {
-    console.error('Core registry deletion fault:', err);
     res.redirect('/dispatch/office');
   }
 });
@@ -212,12 +202,10 @@ router.get('/add', (req, res) => {
   res.render('add-parcel', { title: 'New Parcel Intake — Techo Xpress', page: 'add-parcel', success: false, error: null });
 });
 
-// ── GET: Render the Performance Reports & Branch Summary Console ──
+// ── GET: Render Performance Reports & Branch Summary Console ──
 router.get('/report', async (req, res) => {
   try {
     const ridersList = await Rider.find({});
-    
-    // Default to 'Monthly' view for current month when opening the page
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -237,7 +225,6 @@ router.get('/report', async (req, res) => {
       error: null
     });
   } catch (err) {
-    console.error('Report route error:', err);
     res.status(500).send("Report Subsystem Engine Failure.");
   }
 });
@@ -248,23 +235,17 @@ router.post('/report', async (req, res) => {
 
   try {
     const ridersList = await Rider.find({});
-    
-    // 1. Calculate Date Bounds based on Timeframe Selection (Weekly, Monthly, Yearly, Custom)
     let startDateObj = new Date();
     let endDateObj = new Date();
-
     const now = new Date();
 
     if (timeframe === 'weekly') {
-      // Last 7 Days
       startDateObj = new Date(now.setDate(now.getDate() - 7));
       endDateObj = new Date();
     } else if (timeframe === 'monthly') {
-      // Current Month (from 1st day to last day)
       startDateObj = new Date(now.getFullYear(), now.getMonth(), 1);
       endDateObj = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     } else if (timeframe === 'yearly') {
-      // Current Year (Jan 1 to Dec 31)
       startDateObj = new Date(now.getFullYear(), 0, 1);
       endDateObj = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
     } else if (timeframe === 'custom' && customStart && customEnd) {
@@ -275,18 +256,16 @@ router.post('/report', async (req, res) => {
     const startStr = startDateObj.toISOString().split('T')[0];
     const endStr = endDateObj.toISOString().split('T')[0];
 
-    // Lock query to Sri Lanka timezone offset boundaries (+05:30)
     const absoluteStart = new Date(startStr + "T00:00:00+05:30");
     const absoluteEnd = new Date(endStr + "T23:59:59+05:30");
 
-    // ── MODE A: BRANCH MANAGER SUMMARY REPORT (ALL RIDERS) ──
+    // Mode A: Branch Manager Executive Summary
     if (reportType === 'summary') {
       const deliveredParcels = await Parcel.find({
         status: 'delivered',
         updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
       });
 
-      // Map totals for every registered rider
       const riderSummaries = ridersList.map(rider => {
         const riderParcels = deliveredParcels.filter(p => 
           p.assignedRider && p.assignedRider.toString() === rider._id.toString()
@@ -307,7 +286,6 @@ router.post('/report', async (req, res) => {
           riderId: rider._id,
           name: rider.name,
           vehicle: rider.vehicle,
-          phone: rider.phone,
           deliveredCount: totalDelivered,
           totalCOD,
           totalCommission,
@@ -315,7 +293,6 @@ router.post('/report', async (req, res) => {
         };
       });
 
-      // Branch Grand Totals
       const grandTotalDelivered = riderSummaries.reduce((sum, r) => sum + r.deliveredCount, 0);
       const grandTotalCOD = riderSummaries.reduce((sum, r) => sum + r.totalCOD, 0);
       const grandTotalCommission = riderSummaries.reduce((sum, r) => sum + r.totalCommission, 0);
@@ -348,7 +325,7 @@ router.post('/report', async (req, res) => {
       });
     }
 
-    // ── MODE B: SINGLE COURIER DETAILED AUDIT ──
+    // Mode B: Single Courier Detailed Audit
     else {
       const chosenRider = await Rider.findById(riderId);
       if (!chosenRider) throw new Error("Selected rider profile not found.");
@@ -358,6 +335,12 @@ router.post('/report', async (req, res) => {
         status: 'delivered',
         updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
       });
+
+      // 💵 FETCH CASH SETTLEMENT LOGS FOR THIS RIDER IN DATE RANGE
+      const settlements = await Settlement.find({
+        rider: riderId,
+        createdAt: { $gte: absoluteStart, $lte: absoluteEnd }
+      }).sort({ createdAt: -1 });
 
       let totalCommissionEarned = 0;
       let totalCollectedCOD = 0;
@@ -376,7 +359,8 @@ router.post('/report', async (req, res) => {
         totalDelivered: deliveredParcels.length,
         totalCommission: totalCommissionEarned,
         totalCOD: totalCollectedCOD,
-        parcels: deliveredParcels
+        parcels: deliveredParcels,
+        settlements // 👈 Passed settlement history array
       };
 
       return res.render('report', {
@@ -396,7 +380,6 @@ router.post('/report', async (req, res) => {
     }
 
   } catch (err) {
-    console.error('Report compilation error:', err);
     const fallbackRiders = await Rider.find({}).catch(() => []);
     res.render('report', {
       title: 'Branch Analytics & Metrics — Techo Xpress',
@@ -415,7 +398,7 @@ router.post('/report', async (req, res) => {
   }
 });
 
-// ── POST: Process Intake Form and Instantiate a New Cloud Parcel Document ──
+// ── POST: Process Intake Form ──
 router.post('/add', async (req, res) => {
   const { trackingId, sender, recipient, weight, service, codPrice } = req.body;
   const cleanId = (trackingId || '').trim().toUpperCase();
@@ -423,7 +406,6 @@ router.post('/add', async (req, res) => {
     const duplicateCheck = await Parcel.findOne({ trackingId: cleanId });
     if (duplicateCheck) throw new Error(`Tracking sequence vector ${cleanId} already exists in registry.`);
     
-    // Calculates initial commission without assigned rider
     const assignedCommission = calculateParcelCommission({ sender, recipient, service });
     const { currentTime, currentDate } = getSriLankaTiming();
 
@@ -483,12 +465,11 @@ router.post('/commit', async (req, res) => {
     await targetRider.save();
     res.redirect('/dispatch');
   } catch (err) {
-    console.error('Dispatch error:', err);
     res.redirect('/dispatch');
   }
 });
 
-// ── POST: Close Route Workflow (Closing-by-Exception Audit Engine) ──
+// ── POST: Close Route Workflow ──
 router.post('/close-route', async (req, res) => {
   const { riderId, remainingIds } = req.body;
   const parsedRemaining = Array.isArray(remainingIds) ? remainingIds : [remainingIds].filter(Boolean);
@@ -534,22 +515,39 @@ router.post('/close-route', async (req, res) => {
 
     res.redirect('/dispatch');
   } catch (err) {
-    console.error('Core audit loop fault:', err);
     res.redirect('/dispatch');
   }
 });
 
-// ── POST: Clear Ledger Cash Receivables ──
+// ── 💵 POST: PROCESS PARTIAL OR FULL CASH SETTLEMENT RECEIPT ──
 router.post('/clear-balance', async (req, res) => {
-  const { riderId } = req.body;
+  const { riderId, receivedAmount } = req.body;
   try {
     const rider = await Rider.findById(riderId);
-    if (rider) {
-      rider.pendingBalance = 0; 
-      await rider.save();
+    if (rider && rider.pendingBalance > 0) {
+      const amount = Math.min(Number(receivedAmount) || 0, rider.pendingBalance);
+      
+      if (amount > 0) {
+        // Subtract received partial/full amount from rider's debt
+        rider.pendingBalance = Math.max(0, rider.pendingBalance - amount);
+        await rider.save();
+
+        // Capture Sri Lankan timing metrics
+        const { currentTime, currentDate } = getSriLankaTiming();
+
+        // Create transaction log
+        await Settlement.create({
+          rider: rider._id,
+          amountReceived: amount,
+          remainingBalance: rider.pendingBalance,
+          dateStr: currentDate,
+          timeStr: currentTime
+        });
+      }
     }
     res.redirect('/dispatch');
   } catch (err) {
+    console.error('Cash settlement error:', err);
     res.redirect('/dispatch');
   }
 });
