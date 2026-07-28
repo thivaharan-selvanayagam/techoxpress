@@ -212,78 +212,202 @@ router.get('/add', (req, res) => {
   res.render('add-parcel', { title: 'New Parcel Intake — Techo Xpress', page: 'add-parcel', success: false, error: null });
 });
 
-// ── GET: Render the Rider Performance Reports Selection Console ──
+// ── GET: Render the Performance Reports & Branch Summary Console ──
 router.get('/report', async (req, res) => {
   try {
     const ridersList = await Rider.find({});
+    
+    // Default to 'Monthly' view for current month when opening the page
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
     res.render('report', {
-      title: 'Rider Metrics Report — Techo Xpress',
+      title: 'Branch Analytics & Metrics — Techo Xpress',
       page: 'report',
       riders: ridersList,
+      reportType: 'summary',
+      timeframe: 'monthly',
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      selectedRiderId: '',
+      summaryData: null,
       reportData: null,
       success: false,
       error: null
     });
   } catch (err) {
+    console.error('Report route error:', err);
     res.status(500).send("Report Subsystem Engine Failure.");
   }
 });
 
-// ── POST: Query, Process, and Calculate Metrics for Selected Rider and Date Range ──
+// ── POST: Process Branch Manager Summary or Individual Courier Settlement Audit ──
 router.post('/report', async (req, res) => {
-  const { riderId, startDate, endDate } = req.body;
+  const { reportType, timeframe, riderId, customStart, customEnd } = req.body;
 
   try {
     const ridersList = await Rider.find({});
-    const chosenRider = await Rider.findById(riderId);
-    if (!chosenRider) throw new Error("Selected rider profile not found in database registries.");
+    
+    // 1. Calculate Date Bounds based on Timeframe Selection (Weekly, Monthly, Yearly, Custom)
+    let startDateObj = new Date();
+    let endDateObj = new Date();
 
-    const absoluteStart = new Date(startDate + "T00:00:00+05:30");
-    const absoluteEnd = new Date(endDate + "T23:59:59+05:30");
+    const now = new Date();
 
-    const deliveredParcels = await Parcel.find({
-      assignedRider: riderId,
-      status: 'delivered',
-      updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
-    });
+    if (timeframe === 'weekly') {
+      // Last 7 Days
+      startDateObj = new Date(now.setDate(now.getDate() - 7));
+      endDateObj = new Date();
+    } else if (timeframe === 'monthly') {
+      // Current Month (from 1st day to last day)
+      startDateObj = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDateObj = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    } else if (timeframe === 'yearly') {
+      // Current Year (Jan 1 to Dec 31)
+      startDateObj = new Date(now.getFullYear(), 0, 1);
+      endDateObj = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+    } else if (timeframe === 'custom' && customStart && customEnd) {
+      startDateObj = new Date(customStart + "T00:00:00+05:30");
+      endDateObj = new Date(customEnd + "T23:59:59+05:30");
+    }
 
-    let totalCommissionEarned = 0;
-    let totalCollectedCOD = 0;
+    const startStr = startDateObj.toISOString().split('T')[0];
+    const endStr = endDateObj.toISOString().split('T')[0];
 
-    deliveredParcels.forEach(parcel => {
-      // Calculate dynamic commission for this parcel and rider combination
-      const itemComm = calculateParcelCommission(parcel, chosenRider);
-      totalCommissionEarned += itemComm;
-      totalCollectedCOD += (parcel.codPrice || 0);
-    });
+    // Lock query to Sri Lanka timezone offset boundaries (+05:30)
+    const absoluteStart = new Date(startStr + "T00:00:00+05:30");
+    const absoluteEnd = new Date(endStr + "T23:59:59+05:30");
 
-    const reportData = {
-      riderName: chosenRider.name,
-      vehicle: chosenRider.vehicle,
-      startStr: startDate,
-      endStr: endDate,
-      totalDelivered: deliveredParcels.length,
-      totalCommission: totalCommissionEarned,
-      totalCOD: totalCollectedCOD,
-      parcels: deliveredParcels
-    };
+    // ── MODE A: BRANCH MANAGER SUMMARY REPORT (ALL RIDERS) ──
+    if (reportType === 'summary') {
+      const deliveredParcels = await Parcel.find({
+        status: 'delivered',
+        updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
+      });
 
-    res.render('report', {
-      title: 'Rider Metrics Report — Techo Xpress',
-      page: 'report',
-      riders: ridersList,
-      reportData,
-      success: `Performance matrix compiled for courier ${chosenRider.name}.`,
-      error: null
-    });
+      // Map totals for every registered rider
+      const riderSummaries = ridersList.map(rider => {
+        const riderParcels = deliveredParcels.filter(p => 
+          p.assignedRider && p.assignedRider.toString() === rider._id.toString()
+        );
+
+        let totalDelivered = riderParcels.length;
+        let totalCOD = 0;
+        let totalCommission = 0;
+
+        riderParcels.forEach(p => {
+          totalCOD += (p.codPrice || 0);
+          totalCommission += calculateParcelCommission(p, rider);
+        });
+
+        const netOfficeShare = Math.max(0, totalCOD - totalCommission);
+
+        return {
+          riderId: rider._id,
+          name: rider.name,
+          vehicle: rider.vehicle,
+          phone: rider.phone,
+          deliveredCount: totalDelivered,
+          totalCOD,
+          totalCommission,
+          netOfficeShare
+        };
+      });
+
+      // Branch Grand Totals
+      const grandTotalDelivered = riderSummaries.reduce((sum, r) => sum + r.deliveredCount, 0);
+      const grandTotalCOD = riderSummaries.reduce((sum, r) => sum + r.totalCOD, 0);
+      const grandTotalCommission = riderSummaries.reduce((sum, r) => sum + r.totalCommission, 0);
+      const grandNetOffice = Math.max(0, grandTotalCOD - grandTotalCommission);
+
+      const summaryData = {
+        timeframeLabel: timeframe.toUpperCase(),
+        startStr,
+        endStr,
+        riderSummaries,
+        grandTotalDelivered,
+        grandTotalCOD,
+        grandTotalCommission,
+        grandNetOffice
+      };
+
+      return res.render('report', {
+        title: 'Branch Analytics & Metrics — Techo Xpress',
+        page: 'report',
+        riders: ridersList,
+        reportType: 'summary',
+        timeframe,
+        startDate: startStr,
+        endDate: endStr,
+        selectedRiderId: '',
+        summaryData,
+        reportData: null,
+        success: `Compiled ${timeframe.toUpperCase()} branch executive report.`,
+        error: null
+      });
+    }
+
+    // ── MODE B: SINGLE COURIER DETAILED AUDIT ──
+    else {
+      const chosenRider = await Rider.findById(riderId);
+      if (!chosenRider) throw new Error("Selected rider profile not found.");
+
+      const deliveredParcels = await Parcel.find({
+        assignedRider: riderId,
+        status: 'delivered',
+        updatedAt: { $gte: absoluteStart, $lte: absoluteEnd }
+      });
+
+      let totalCommissionEarned = 0;
+      let totalCollectedCOD = 0;
+
+      deliveredParcels.forEach(parcel => {
+        const itemComm = calculateParcelCommission(parcel, chosenRider);
+        totalCommissionEarned += itemComm;
+        totalCollectedCOD += (parcel.codPrice || 0);
+      });
+
+      const reportData = {
+        riderName: chosenRider.name,
+        vehicle: chosenRider.vehicle,
+        startStr,
+        endStr,
+        totalDelivered: deliveredParcels.length,
+        totalCommission: totalCommissionEarned,
+        totalCOD: totalCollectedCOD,
+        parcels: deliveredParcels
+      };
+
+      return res.render('report', {
+        title: 'Rider Metrics Report — Techo Xpress',
+        page: 'report',
+        riders: ridersList,
+        reportType: 'single',
+        timeframe,
+        startDate: startStr,
+        endDate: endStr,
+        selectedRiderId: riderId,
+        summaryData: null,
+        reportData,
+        success: `Performance audit compiled for ${chosenRider.name}.`,
+        error: null
+      });
+    }
 
   } catch (err) {
-    console.error(err);
+    console.error('Report compilation error:', err);
     const fallbackRiders = await Rider.find({}).catch(() => []);
     res.render('report', {
-      title: 'Rider Metrics Report — Techo Xpress',
+      title: 'Branch Analytics & Metrics — Techo Xpress',
       page: 'report',
       riders: fallbackRiders,
+      reportType: 'summary',
+      timeframe: 'monthly',
+      startDate: '',
+      endDate: '',
+      selectedRiderId: '',
+      summaryData: null,
       reportData: null,
       success: false,
       error: `Report Generation Terminated: ${err.message}`

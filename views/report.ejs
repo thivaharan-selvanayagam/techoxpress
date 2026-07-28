@@ -5,14 +5,14 @@
 <style>
   .report-filter-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1.5fr 1fr;
     gap: 1.5rem;
     align-items: end;
   }
   
   .report-stats-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
     margin-bottom: 3rem;
   }
@@ -23,7 +23,19 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Responsive breakpoints wrap inputs and metrics cards on small viewports */
+  .timeframe-badge {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(212, 79, 10, 0.12);
+    color: var(--orange);
+    border: 1px solid rgba(212, 79, 10, 0.25);
+  }
+
   @media (max-width: 960px) {
     .report-filter-grid, .report-stats-grid {
       grid-template-columns: 1fr !important;
@@ -49,90 +61,206 @@
   <div class="page-hero__bg"></div>
   <div class="page-hero__accent"></div>
   <div class="container">
-    <div class="page-hero__label">Logistics Data Analytics</div>
-    <h1 class="page-hero__title" style="color: #0F172A;">PERFORMANCE<br><em>LEDGER REPORTS.</em></h1>
+    <div class="page-hero__label">Branch Intelligence & Analytics</div>
+    <h1 class="page-hero__title" style="color: #0F172A;">MANAGEMENT<br><em>EXECUTIVE REPORTS.</em></h1>
   </div>
 </section>
 
 <section class="contact-page" style="padding-top: 2rem; background: var(--bg);">
   <div class="container" style="max-width: 1200px;">
     
-    <!-- FILTER CONTROL PARAMETERS CARD -->
+    <!-- 🎛️ FILTER CONTROL PARAMETERS CARD -->
     <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
-      <div class="mono-label" style="color: var(--orange); margin-bottom: 0.5rem;">Audit Filter Parameters</div>
-      <h2 class="form-heading" style="font-size: 1.6rem; margin-bottom: 1.5rem; color: #0F172A;">Generate Settlement Audit</h2>
+      <div class="mono-label" style="color: var(--orange); margin-bottom: 0.5rem;">Branch Manager Control Center</div>
+      <h2 class="form-heading" style="font-size: 1.6rem; margin-bottom: 1.5rem; color: #0F172A;">Compile Analytics Summary</h2>
 
-      <form method="POST" action="/dispatch/report">
-        <div class="report-filter-grid">
+      <% if (success) { %>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 1rem; border-radius: var(--radius); color: #10b981; font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 600;">
+          ✓ <%= success %>
+        </div>
+      <% } %>
+
+      <% if (error) { %>
+        <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 600;">
+          ✕ <%= error %>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/dispatch/report" id="reportForm">
+        
+        <div class="report-filter-grid" style="margin-bottom: 1.5rem;">
           
+          <!-- REPORT TYPE SELECTOR -->
           <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Select Target Rider Unit *</label>
-            <select name="riderId" required style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none; -webkit-appearance: select;">
-              <option value="" style="color: var(--muted);">-- CHOOSE COURIER UNIT FOR AUDIT --</option>
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">1. Scope Level *</label>
+            <select name="reportType" id="reportTypeSelect" required onchange="toggleScopeInputs()" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
+              <option value="summary" <%= reportType === 'summary' ? 'selected' : '' %>>📊 Branch Manager Executive Summary (All Riders)</option>
+              <option value="single" <%= reportType === 'single' ? 'selected' : '' %>>🏍️ Single Courier Detailed Audit</option>
+            </select>
+          </div>
+
+          <!-- TIMEFRAME PRESET SELECTOR (WEEKLY / MONTHLY / YEARLY) -->
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">2. Timeframe Window *</label>
+            <select name="timeframe" id="timeframeSelect" required onchange="toggleTimeframeInputs()" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
+              <option value="weekly" <%= timeframe === 'weekly' ? 'selected' : '' %>>📅 Weekly (Last 7 Days)</option>
+              <option value="monthly" <%= timeframe === 'monthly' ? 'selected' : '' %>>🗓️ Monthly (Current Month)</option>
+              <option value="yearly" <%= timeframe === 'yearly' ? 'selected' : '' %>>📈 Yearly (Current Calendar Year)</option>
+              <option value="custom" <%= timeframe === 'custom' ? 'selected' : '' %>>⚙️ Custom Date Range...</option>
+            </select>
+          </div>
+
+          <!-- SINGLE RIDER SELECTOR (SHOWN ONLY IF SINGLE SCOPE IS ACTIVE) -->
+          <div class="form-group" id="riderSelectGroup" style="<%= reportType === 'single' ? 'display: block;' : 'display: none;' %>">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Target Rider Unit *</label>
+            <select name="riderId" style="width: 100%; padding: 1rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
+              <option value="">-- CHOOSE COURIER --</option>
               <% riders.forEach(r => { %>
-                <option value="<%= r._id %>" style="color: var(--text);"><%= r.name %> [<%= r.vehicle %>]</option>
+                <option value="<%= r._id %>" <%= selectedRiderId.toString() === r._id.toString() ? 'selected' : '' %>><%= r.name %></option>
               <% }) %>
             </select>
           </div>
 
-          <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Start Date *</label>
-            <input type="date" name="startDate" required style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
-          </div>
-
-          <div class="form-group">
-            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">End Date *</label>
-            <input type="date" name="endDate" required style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
-          </div>
-
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; justify-content: center; padding: 1.1rem; border: none; border-radius: var(--radius); cursor: pointer; box-shadow: 0 4px 14px var(--orange-glow);">
-          Compile Performance & Financial Statement
+        <!-- CUSTOM DATE INPUTS (SHOWN ONLY IF 'CUSTOM' TIMEFRAME IS SELECTED) -->
+        <div id="customDateGroup" style="<%= timeframe === 'custom' ? 'display: grid;' : 'display: none;' %> grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Start Date *</label>
+            <input type="date" name="customStart" value="<%= startDate %>" style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">End Date *</label>
+            <input type="date" name="customEnd" value="<%= endDate %>" style="width: 100%; padding: 0.9rem; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-weight: 600; outline: none;">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1.1rem; border: none; border-radius: var(--radius); cursor: pointer; box-shadow: 0 4px 14px var(--orange-glow); font-weight: bold;">
+          Generate Management Report ➔
         </button>
       </form>
     </div>
 
-    <!-- DYNAMIC COMPILED REPORT SECTION -->
+    <!-- 📊 MODE A: BRANCH MANAGER EXECUTIVE SUMMARY REPORT (ALL RIDERS) -->
+    <% if (summaryData) { %>
+      <div style="margin-bottom: 4rem;">
+        
+        <div style="margin-bottom: 2rem; border-left: 4px solid var(--orange); padding-left: 1rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="color: #0F172A; margin: 0; font-size: 2rem; font-family: var(--font-head); font-weight: 800;">Branch Executive Summary</h2>
+            <p style="color: var(--muted); font-family: var(--font-mono); font-size: 0.88rem; margin-top: 0.2rem; font-weight: 600;">
+              📅 Timeline: <span style="color: #0F172A; font-weight: bold;"><%= summaryData.startStr %></span> to <span style="color: #0F172A; font-weight: bold;"><%= summaryData.endStr %></span>
+            </p>
+          </div>
+          <span class="timeframe-badge"><%= summaryData.timeframeLabel %> REPORT</span>
+        </div>
+
+        <!-- GRAND TOTAL SCORECARD CARDS -->
+        <div class="report-stats-grid">
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid var(--orange);">
+            <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total Parcels Delivered</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: var(--orange); font-family: var(--font-mono);"><%= summaryData.grandTotalDelivered %> <span style="font-size: 1rem; color: var(--muted);">Units</span></div>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid #10b981;">
+            <div style="color: #10b981; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total COD Cash Collected</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #10b981; font-family: var(--font-mono);">LKR <%= summaryData.grandTotalCOD.toLocaleString() %></div>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid #3b82f6;">
+            <div style="color: #3b82f6; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total Rider Commissions</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #3b82f6; font-family: var(--font-mono);">LKR <%= summaryData.grandTotalCommission.toLocaleString() %></div>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid #0F172A;">
+            <div style="color: #0F172A; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Net Office Receivable</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #0F172A; font-family: var(--font-mono);">LKR <%= summaryData.grandNetOffice.toLocaleString() %></div>
+          </div>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY RIDER MATRIX TABLE -->
+        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius);">
+          <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+            Rider Performance & Financial Ledger Breakdown
+          </h3>
+
+          <div class="table-capsule">
+            <table style="width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.88rem; color: var(--text);">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border); color: var(--muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700;">
+                  <th style="padding: 0.8rem 0.5rem;">Rider Unit</th>
+                  <th style="padding: 0.8rem 0.5rem; text-align: center;">Vehicle</th>
+                  <th style="padding: 0.8rem 0.5rem; text-align: center;">Delivered</th>
+                  <th style="padding: 0.8rem 0.5rem; text-align: right;">COD Collected</th>
+                  <th style="padding: 0.8rem 0.5rem; text-align: right;">Commission Earned</th>
+                  <th style="padding: 0.8rem 0.5rem; text-align: right;">Due Back To Hub</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% summaryData.riderSummaries.forEach(r => { %>
+                  <tr style="border-bottom: 1px solid var(--border); font-weight: 600;">
+                    <td style="padding: 0.9rem 0.5rem; font-weight: 700; color: var(--orange);">🏍️ <%= r.name %></td>
+                    <td style="padding: 0.9rem 0.5rem; text-align: center; color: var(--muted); font-size: 0.8rem;"><%= r.vehicle %></td>
+                    <td style="padding: 0.9rem 0.5rem; text-align: center; font-weight: 800; color: #0F172A;"><%= r.deliveredCount %></td>
+                    <td style="padding: 0.9rem 0.5rem; text-align: right; color: var(--text);">LKR <%= r.totalCOD.toLocaleString() %></td>
+                    <td style="padding: 0.9rem 0.5rem; text-align: right; color: #3b82f6;">LKR <%= r.totalCommission.toLocaleString() %></td>
+                    <td style="padding: 0.9rem 0.5rem; text-align: right; color: #10b981; font-weight: 800;">LKR <%= r.netOfficeShare.toLocaleString() %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+              <!-- GRAND TOTAL FOOTER ROW -->
+              <tfoot>
+                <tr style="background: rgba(15, 23, 42, 0.04); font-weight: 800; border-top: 2px solid #0F172A;">
+                  <td style="padding: 1rem 0.5rem; color: #0F172A;">BRANCH TOTALS</td>
+                  <td style="padding: 1rem 0.5rem; text-align: center; color: var(--muted);">--</td>
+                  <td style="padding: 1rem 0.5rem; text-align: center; color: var(--orange); font-size: 1rem;"><%= summaryData.grandTotalDelivered %></td>
+                  <td style="padding: 1rem 0.5rem; text-align: right; color: #0F172A;">LKR <%= summaryData.grandTotalCOD.toLocaleString() %></td>
+                  <td style="padding: 1rem 0.5rem; text-align: right; color: #3b82f6;">LKR <%= summaryData.grandTotalCommission.toLocaleString() %></td>
+                  <td style="padding: 1rem 0.5rem; text-align: right; color: #10b981; font-size: 1rem;">LKR <%= summaryData.grandNetOffice.toLocaleString() %></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    <% } %>
+
+    <!-- 🏍️ MODE B: SINGLE COURIER DETAILED AUDIT -->
     <% if (reportData) { %>
       <div style="margin-bottom: 4rem;">
         
-        <!-- Audit Window Metadata Label -->
         <div style="margin-bottom: 2rem; border-left: 4px solid var(--orange); padding-left: 1rem;">
           <h2 style="color: #0F172A; margin: 0; font-size: 2rem; font-family: var(--font-head); font-weight: 800;"><%= reportData.riderName %></h2>
           <p style="color: var(--muted); font-family: var(--font-mono); font-size: 0.88rem; margin-top: 0.2rem; font-weight: 600;">
-            📅 Timeline Window: <span style="color: #0F172A; font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: #0F172A; font-weight: bold;"><%= reportData.endStr %></span> (Asia/Colombo)
+            📅 Audit Window: <span style="color: #0F172A; font-weight: bold;"><%= reportData.startStr %></span> to <span style="color: #0F172A; font-weight: bold;"><%= reportData.endStr %></span>
           </p>
         </div>
 
-        <!-- Metric Scoreboard Grid Counters -->
         <div class="report-stats-grid">
-          
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid #10b981;">
-            <div style="color: #10b981; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">1. Total Commission Earned</div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid #10b981;">
+            <div style="color: #10b981; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">1. Total Commission Earned</div>
             <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #10b981; font-family: var(--font-mono);">LKR <%= reportData.totalCommission.toLocaleString() %></div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid var(--orange);">
-            <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">2. Total Parcels Delivered</div>
-            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: var(--orange); font-family: var(--font-mono);"><%= reportData.totalDelivered %> <span style="font-size: 1.1rem; color: var(--muted); font-weight: 500;">Units</span></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid var(--orange);">
+            <div style="color: var(--orange); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">2. Total Parcels Delivered</div>
+            <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: var(--orange); font-family: var(--font-mono);"><%= reportData.totalDelivered %> <span style="font-size: 1.1rem; color: var(--muted);">Units</span></div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.005); border-bottom: 3px solid #0F172A;">
-            <div style="color: #0F172A; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700;">3. Total COD Cash Collected</div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius); text-align: center; border-bottom: 3px solid #0F172A;">
+            <div style="color: #0F172A; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">3. Total COD Cash Collected</div>
             <div class="stat-card-value" style="font-size: 2.2rem; font-weight: 800; color: #0F172A; font-family: var(--font-mono);">LKR <%= reportData.totalCOD.toLocaleString() %></div>
           </div>
-
         </div>
 
-        <!-- ITEMIZED HISTORICAL LEDGER BREAKDOWN SHEET -->
-        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.01);">
-          <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; letter-spacing: 0.02em;">Historical Audit Log Breakdown</h3>
+        <div class="contact-form-box" style="background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; border-radius: var(--radius);">
+          <h3 style="color: #0F172A; font-family: var(--font-head); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Historical Audit Log Breakdown</h3>
           
           <% if (reportData.parcels.length === 0) { %>
-            <p style="color: var(--muted); font-style: italic; text-align: center; padding: 2rem 0; font-weight: 500;">No successful delivery records tracked for this unit within selected parameters.</p>
+            <p style="color: var(--muted); font-style: italic; text-align: center; padding: 2rem 0;">No successful delivery records tracked for this unit within selected parameters.</p>
           <% } else { %>
-            <!-- Responsive container intercepts and enables clean touch scrolling on narrow screen profiles -->
             <div class="table-capsule">
               <table style="width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.88rem; color: var(--text);">
                 <thead>
@@ -163,5 +291,28 @@
 
   </div>
 </section>
+
+<!-- 🛠️ DYNAMIC FORM INTERACTION LOGIC -->
+<script>
+  function toggleScopeInputs() {
+    const scope = document.getElementById('reportTypeSelect').value;
+    const riderGroup = document.getElementById('riderSelectGroup');
+    if (scope === 'single') {
+      riderGroup.style.display = 'block';
+    } else {
+      riderGroup.style.display = 'none';
+    }
+  }
+
+  function toggleTimeframeInputs() {
+    const timeframe = document.getElementById('timeframeSelect').value;
+    const customGroup = document.getElementById('customDateGroup');
+    if (timeframe === 'custom') {
+      customGroup.style.display = 'grid';
+    } else {
+      customGroup.style.display = 'none';
+    }
+  }
+</script>
 
 <%- include('partials/footer') %>
