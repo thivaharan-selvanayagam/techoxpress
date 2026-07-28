@@ -27,13 +27,16 @@
         
         <% if (error) { %>
         <div class="form-alert form-alert--error" style="margin-bottom: 2rem; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 1rem; border-radius: var(--radius); color: #e74c3c; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.9rem;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <%= error %>
         </div>
         <% } %>
 
         <form method="POST" action="/dispatch/add">
           
+          <!-- Hidden fallback for backend service tier variable requirement -->
+          <input type="hidden" name="service" value="Standard Delivery">
+
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
             <div class="form-group">
               <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Generated Tracking ID Vector *</label>
@@ -62,9 +65,16 @@
           </div>
 
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            
+            <!-- 🏢 DROPDOWN: REGISTERED SENDER COMPANIES -->
             <div class="form-group">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Sender Origin Metrics *</label>
-              <input type="text" name="sender" placeholder="Company Name / Address" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--orange); outline: none;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Sender Origin Merchant *</label>
+              <select name="sender" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--orange); font-family: var(--font-mono); outline: none; height: 56px;">
+                <option value="" disabled selected>Select Merchant...</option>
+                <option value="DDD">DDD</option>
+                <option value="CCE">CCE</option>
+                <option value="Temu">Temu</option>
+              </select>
             </div>
             
             <div class="form-group">
@@ -251,38 +261,28 @@
             </div>
           </div>
 
-          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
-            <div class="form-group">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Cargo Mass Dimension *</label>
-              <select name="weight" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--orange); outline: none; height: 100%; font-family: var(--font-mono);">
-                <option value="1kg">1kg</option>
-                <option value="2kg">2kg</option>
-                <option value="3kg">3kg</option>
-                <option value="4kg">4kg</option>
-                <option value="5kg">5kg</option>
-                <option value="6kg">6kg</option>
-                <option value="7kg">7kg</option>
-                <option value="8kg">8kg</option>
-                <option value="9kg">9kg</option>
-                <option value="10kg">10kg</option>
-                <option value="10+kg">10+kg</option>
-                <option value="15+kg">15+kg</option>
-                <option value="20+kg">20+kg</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase;">Service Urgency Protocol *</label>
-              <select name="service" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--orange); outline: none; height: 100%;">
-                <option value="Same-Day Express">Same-Day Express</option>
-                <option value="Next-Day Delivery">Next-Day Delivery</option>
-                <option value="Standard Ground Cargo">Standard Ground Cargo</option>
-              </select>
-            </div>
+          <!-- ⚖️ CARGO MASS DIMENSION -->
+          <div class="form-group" style="margin-bottom: 2.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Cargo Mass Dimension *</label>
+            <select name="weight" required style="width: 100%; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--orange); outline: none; height: 56px; font-family: var(--font-mono);">
+              <option value="1kg">1kg</option>
+              <option value="2kg">2kg</option>
+              <option value="3kg">3kg</option>
+              <option value="4kg">4kg</option>
+              <option value="5kg">5kg</option>
+              <option value="6kg">6kg</option>
+              <option value="7kg">7kg</option>
+              <option value="8kg">8kg</option>
+              <option value="9kg">9kg</option>
+              <option value="10kg">10kg</option>
+              <option value="10+kg">10+kg</option>
+              <option value="15+kg">15+kg</option>
+              <option value="20+kg">20+kg</option>
+            </select>
           </div>
 
           <button type="submit" class="track-btn" style="width: 100%; justify-content: center; padding: 1.1rem; background: var(--orange); color: var(--white); font-weight: bold; border: none; border-radius: var(--radius); cursor: pointer;">
-            Inject Package Into Cloud Pipeline
+            Save
           </button>
         </form>
 

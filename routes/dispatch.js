@@ -25,7 +25,7 @@ const cityCommissions = {
   "kaankeyanodai": 150, "kaayankeny": 150, "kadaloor (santhiveli)": 150, "kadaloor - santhiveli": 150,
   "kadukamunai": 150, "kalkudah": 150, "kallady": 150, "kallady mugathuvaram": 150, "kallady uppodai": 150,
   "kallady veloor": 150, "kalladytheru": 150, "kalliyankadu": 150, "kalumunthaveli": 200, "kaluthavalai": 150,
-  "kaluthavalai": 150, "kaluwanchikudi": 150, "kaluwankeny": 150, "kannakipuram": 200, "kannankudah": 150, "karadiyanaru": 150,
+  "kaluwanchikudi": 150, "kaluwankeny": 150, "kannakipuram": 200, "kannankudah": 150, "karadiyanaru": 150,
   "karaiyaakan theevu": 150, "karavetti": 200, "karuvakeny": 150, "karuveppankerni": 150, "katchenai": 150,
   "kathankudy": 150, "kathiraveli": 200, "kawathamunai": 150, "kiran": 150, "kirankulam": 150, "kiththul": 200,
   "kokkatichcholai": 150, "kokkuvil": 150, "komathurai": 150, "koorakallimadu": 150, "kooraveli": 150,
@@ -33,7 +33,7 @@ const cityCommissions = {
   "kumarapuram": 150, "kumburumulai": 150, "kunjankulam": 200, "kurinjamunai": 150, "kurukalmadam": 150,
   "kurumanveli": 150, "maankaadu": 150, "maavadivembu": 150, "mahiladiththeevu": 150, "mahiloor": 150,
   "makilavettuvan": 200, "malaiyrakattu": 200, "mamangam": 150, "manalpitti": 150, "mangikattu": 150,
-  "manjanthoduvaai": 150, "manmunai": 150, "mandoor": 200, "mattikali": 150, "mavadichenai": 150,
+  "manjanthoduvaai": 150, "manmunai": 150, "mandoor": 150, "mattikali": 150, "mavadichenai": 150,
   "mayilampaveli": 150, "meravodai": 150, "munaikaadu": 150, "murakottanchenai": 150, "muruththanai": 200,
   "naavatkaadu": 150, "nadarajananthapuram": 150, "naripulthootam": 200, "nasivantheevu": 150, "navalady": 150,
   "navalady - kallady": 150, "navatkeny": 150, "navatkuda": 150, "nediyavettai": 200, "nochchimunai": 150,
@@ -53,6 +53,31 @@ const cityCommissions = {
   "urukamam": 200, "vahaneri": 200, "vaharai": 200, "valaichchenai": 150, "valaiyiravu": 150,
   "vantharumulai": 150, "vavunatheevu": 150, "veechchikalmunai": 150, "vellaveli": 150, "velodiyamalai": 200,
   "vinayakapuram (valaichenai)": 150, "vinayakapuram - valaichenai": 150
+};
+
+// ── 🎯 DYNAMIC COMMISSION CALCULATION ENGINE ──
+const calculateParcelCommission = (parcel, rider = null) => {
+  const senderName = (parcel.sender || '').trim().toLowerCase();
+  const serviceName = (parcel.service || '').trim().toLowerCase();
+  const isTemu = senderName.includes('temu') || serviceName.includes('temu');
+
+  // RULE 1: All Temu parcels have a fixed LKR 150 commission for any rider & any city
+  if (isTemu) {
+    return 150;
+  }
+
+  // RULE 2: Sathees koombiyo (RIDER-002) gets LKR 200 for every non-Temu parcel
+  if (rider) {
+    const isSathees = (rider.riderId === 'RIDER-002') || 
+                      (rider.name && rider.name.toLowerCase().includes('sathees'));
+    if (isSathees) {
+      return 200;
+    }
+  }
+
+  // RULE 3: Standard City Commission Matrix (Default: LKR 150)
+  const recipientCity = (parcel.recipient || '').trim().toLowerCase();
+  return cityCommissions[recipientCity] || 150;
 };
 
 // Helper function to generate standardized Sri Lankan timestamp vectors
@@ -113,7 +138,6 @@ router.get('/office', async (req, res) => {
   }
 });
 
-
 // ── GET: Render the Edit Form for a Specific Parcel ──
 router.get('/edit/:id', async (req, res) => {
   try {
@@ -137,9 +161,16 @@ router.post('/edit/:id', async (req, res) => {
   const { sender, recipient, weight, service, codPrice } = req.body;
   
   try {
-    // Dynamic Commission Re-calculation in case the city was changed
-    const searchCityKey = (recipient || '').trim().toLowerCase();
-    const updatedCommission = cityCommissions[searchCityKey] || 150;
+    const parcel = await Parcel.findById(req.params.id);
+    if (!parcel) throw new Error('Parcel not found.');
+
+    let rider = null;
+    if (parcel.assignedRider) {
+      rider = await Rider.findById(parcel.assignedRider);
+    }
+
+    const updatedParcelData = { sender, recipient, service };
+    const updatedCommission = calculateParcelCommission(updatedParcelData, rider);
 
     await Parcel.findByIdAndUpdate(req.params.id, {
       $set: {
@@ -152,7 +183,7 @@ router.post('/edit/:id', async (req, res) => {
       }
     });
 
-    res.redirect('/dispatch/office'); // Take back to inventory sheet on success
+    res.redirect('/dispatch/office');
   } catch (err) {
     console.error('Failed to update parcel parameters:', err);
     const fallbackParcel = await Parcel.findById(req.params.id).catch(() => null);
@@ -165,12 +196,11 @@ router.post('/edit/:id', async (req, res) => {
   }
 });
 
-
 // ── POST: Permanently Delete an Entire Parcel ──
 router.post('/delete/:id', async (req, res) => {
   try {
     await Parcel.findByIdAndDelete(req.params.id);
-    res.redirect('/dispatch/office'); // Refresh page following deletion
+    res.redirect('/dispatch/office');
   } catch (err) {
     console.error('Core registry deletion fault:', err);
     res.redirect('/dispatch/office');
@@ -221,11 +251,8 @@ router.post('/report', async (req, res) => {
     let totalCollectedCOD = 0;
 
     deliveredParcels.forEach(parcel => {
-      let itemComm = Number(parcel.commission);
-      if (!itemComm || itemComm === 0) {
-        const lookupKey = (parcel.recipient || '').trim().toLowerCase();
-        itemComm = cityCommissions[lookupKey] || 150;
-      }
+      // Calculate dynamic commission for this parcel and rider combination
+      const itemComm = calculateParcelCommission(parcel, chosenRider);
       totalCommissionEarned += itemComm;
       totalCollectedCOD += (parcel.codPrice || 0);
     });
@@ -272,14 +299,22 @@ router.post('/add', async (req, res) => {
     const duplicateCheck = await Parcel.findOne({ trackingId: cleanId });
     if (duplicateCheck) throw new Error(`Tracking sequence vector ${cleanId} already exists in registry.`);
     
-    const searchCityKey = recipient.trim().toLowerCase();
-    const assignedCommission = cityCommissions[searchCityKey] || 150;
+    // Calculates initial commission without assigned rider
+    const assignedCommission = calculateParcelCommission({ sender, recipient, service });
     const { currentTime, currentDate } = getSriLankaTiming();
 
     const freshParcel = new Parcel({
-      trackingId: cleanId, sender: sender.trim(), recipient: recipient.trim(), weight: weight.trim(), service,
-      codPrice: Number(codPrice) || 0, commission: assignedCommission, status: 'transit', statusLabel: 'Manifested',
-      eta: 'Pending Assignment', assignedRider: null,
+      trackingId: cleanId, 
+      sender: sender.trim(), 
+      recipient: recipient.trim(), 
+      weight: weight.trim(), 
+      service,
+      codPrice: Number(codPrice) || 0, 
+      commission: assignedCommission, 
+      status: 'transit', 
+      statusLabel: 'Manifested',
+      eta: 'Pending Assignment', 
+      assignedRider: null,
       events: [{ time: currentTime, date: currentDate, label: 'Manifested', desc: `Shipment entry logged at hub. Commission set: LKR ${assignedCommission}`, done: true }]
     });
 
@@ -300,18 +335,31 @@ router.post('/commit', async (req, res) => {
     if (parsedIds.length === 0) throw new Error('Staging area clear. Scan at least one parcel.');
 
     const { currentTime, currentDate } = getSriLankaTiming();
-    await Parcel.updateMany(
-      { trackingId: { $in: parsedIds } },
-      {
-        $set: { assignedRider: targetRider._id, status: 'transit', statusLabel: 'Out for Delivery', eta: 'Arriving Today' },
-        $push: { events: { $each: [{ time: currentTime, date: currentDate, label: 'Rider Dispatched', desc: `Package out via courier ${targetRider.name}.`, done: true }], $position: 0 } }
-      }
-    );
+    const parcelsToDispatch = await Parcel.find({ trackingId: { $in: parsedIds } });
+
+    for (let parcel of parcelsToDispatch) {
+      const assignedCommission = calculateParcelCommission(parcel, targetRider);
+      
+      parcel.assignedRider = targetRider._id;
+      parcel.status = 'transit';
+      parcel.statusLabel = 'Out for Delivery';
+      parcel.eta = 'Arriving Today';
+      parcel.commission = assignedCommission;
+      parcel.events.unshift({
+        time: currentTime,
+        date: currentDate,
+        label: 'Rider Dispatched',
+        desc: `Package out via courier ${targetRider.name}. Commission set: LKR ${assignedCommission}`,
+        done: true
+      });
+      await parcel.save();
+    }
 
     targetRider.status = 'In Transit';
     await targetRider.save();
     res.redirect('/dispatch');
   } catch (err) {
+    console.error('Dispatch error:', err);
     res.redirect('/dispatch');
   }
 });
@@ -344,13 +392,10 @@ router.post('/close-route', async (req, res) => {
         parcel.statusLabel = 'Delivered';
         parcel.eta = 'Completed';
         parcel.events.unshift({ time: currentTime, date: currentDate, label: 'Delivered', desc: 'Delivery verification check-out completed.', done: true });
+        
+        const itemCommission = calculateParcelCommission(parcel, rider);
+        parcel.commission = itemCommission;
         await parcel.save();
-
-        let itemCommission = Number(parcel.commission);
-        if (!itemCommission || itemCommission === 0) {
-          const searchCityKey = (parcel.recipient || '').trim().toLowerCase();
-          itemCommission = cityCommissions[searchCityKey] || 150;
-        }
 
         collectedCOD += (parcel.codPrice || 0);
         totalRiderCommission += itemCommission;
