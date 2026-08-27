@@ -49,7 +49,7 @@ const cityCommissions = {
   "thaandiyadi": 150, "thalankudah": 150, "thamaraikeny (batticaloa)": 150, "thamaraikeny - batticaloa": 150,
   "thandavanveli": 150, "thannamunai": 150, "theethatheevu": 150, "thikilivettai": 200, "thikkodai": 200,
   "thimilatheevu": 150, "thiraimadu": 150, "thirichchandur": 150, "thirukondaimadu": 150, "thirupperumthurai": 150,
-  "thiyawattuwan": 150, "thumpankeny": 150, "thurai neelavanai": 200, "unnichchai": 200, "uppukaraichai": 150,
+  "thiyawattuwan": 150, "thumpankeny": 200, "thurai neelavanai": 200, "unnichchai": 200, "uppukaraichai": 150,
   "urukamam": 200, "vahaneri": 200, "vaharai": 200, "valaichchenai": 150, "valaiyiravu": 150,
   "vantharumulai": 150, "vavunatheevu": 150, "veechchikalmunai": 150, "vellaveli": 150, "velodiyamalai": 200,
   "vinayakapuram (valaichenai)": 150, "vinayakapuram - valaichenai": 150
